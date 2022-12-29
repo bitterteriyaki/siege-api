@@ -429,4 +429,4 @@ testing = ["coverage (>=6.2)", "coverage-enable-subprocess (>=1)", "flaky (>=3.7
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "0d71e0be242259e76d187968a853064ffda3c7185ba11bf9904f03efac2a4b07"
+content-hash = "d8e3d2347c5eeadad6ebd56bfa11780fa40aba2f82b4d6bf575f0e3e0e4a9020"
