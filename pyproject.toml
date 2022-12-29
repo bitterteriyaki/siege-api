@@ -17,6 +17,7 @@ django-stubs = "^1.13.1"
 mypy = "^0.991"
 black = "^22.12.0"
 isort = "^5.11.4"
+commitizen = "^2.38.0"
 
 [tool.black]
 color = true
@@ -25,6 +26,13 @@ line-length = 79
 [tool.isort]
 profile = "black"
 line_length = 79
+
+# TODO: add a custom changelog template
+[tool.commitizen]
+version = "0.1.0"
+version_files = ["pyproject.toml"]
+update_changelog_on_bump = true
+changelog_incremental = true
 
 [build-system]
 requires = ["poetry-core"]
