@@ -13,6 +13,7 @@ from django.db.models import (
 )
 
 from core.models import TimestampedModel
+from core.tokens import generate_token
 
 
 class UserManager(BaseUserManager):
@@ -43,8 +44,9 @@ class UserManager(BaseUserManager):
 
         tag = random.choice(available_tags)
         email = self.normalize_email(email)
+        token = generate_token(email, password)
 
-        user = self.model(username=username, email=email, tag=tag)
+        user = self.model(username=username, email=email, tag=tag, token=token)
         user.set_password(password)
         user.save()
 
