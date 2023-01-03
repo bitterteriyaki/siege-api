@@ -1,6 +1,6 @@
 from rest_framework.serializers import CharField, ModelSerializer
 
-from server.apps.users.models import User
+from apps.users.models import User
 
 
 class UsersSerializer(ModelSerializer):

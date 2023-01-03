@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.views import APIView
 
-from server.apps.users.serializers import UsersSerializer
-from server.core.renderers import BaseJSONRenderer
+from apps.users.serializers import UsersSerializer
+from core.renderers import BaseJSONRenderer
 
 
 class UsersView(APIView):

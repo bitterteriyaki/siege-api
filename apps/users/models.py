@@ -12,7 +12,7 @@ from django.db.models import (
     SmallIntegerField,
 )
 
-from server.core.models import TimestampedModel
+from core.models import TimestampedModel
 
 
 class UserManager(BaseUserManager):

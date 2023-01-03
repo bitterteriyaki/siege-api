@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.test import APITestCase
 
-from server.apps.users.models import User
+from apps.users.models import User
 
 
 class UsersTestCase(APITestCase):
