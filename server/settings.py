@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "server.apps.users",
 ]
 
 MIDDLEWARE = [
@@ -134,3 +136,17 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Tell Django about the custom `User` model we created.
+AUTH_USER_MODEL = "users.User"
+
+# Django Rest Framework settings
+# https://www.django-rest-framework.org/api-guide/settings/
+
+DEFAULT_VERSIONING_CLASS = "rest_framework.versioning.URLPathVersioning"
+TEST_REQUEST_DEFAULT_FORMAT = "json"
+
+REST_FRAMEWORK = {
+    "DEFAULT_VERSIONING_CLASS": DEFAULT_VERSIONING_CLASS,
+    "TEST_REQUEST_DEFAULT_FORMAT": TEST_REQUEST_DEFAULT_FORMAT,
+}
