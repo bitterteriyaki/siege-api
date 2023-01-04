@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -88,6 +89,15 @@ DATABASES = {
         "PORT": 5432,
     }
 }
+
+# NOTE:
+# This is a temporary solution to allow the tests to run on
+# GitHub Actions. It is necessary to add a way to separate the
+# environments later on.
+
+if os.getenv("GITHUB_WORKFLOW"):
+    DATABASES["default"]["NAME"] = "github-actions"
+    DATABASES["default"]["HOST"] = "localhost"
 
 
 # Password validation
