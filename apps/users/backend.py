@@ -1,5 +1,8 @@
 import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from datetime import datetime
+
+from snowflake import SnowflakeGenerator
 
 from server.settings import SECRET_KEY
 
@@ -72,3 +75,7 @@ def generate_token(email, password, version="v1"):
     match version:
         case "v1":
             return _generate_token_v1(email, password)
+
+
+epoch = int(datetime(2023, 1, 1, 0, 0, 0, 0).timestamp())
+id_generator = SnowflakeGenerator(42, epoch=epoch)

@@ -596,6 +596,18 @@ testing = ["build[virtualenv]", "filelock (>=3.4.0)", "flake8 (<5)", "flake8-202
 testing-integration = ["build[virtualenv]", "filelock (>=3.4.0)", "jaraco.envs (>=2.2)", "jaraco.path (>=3.2.0)", "pytest", "pytest-enabler", "pytest-xdist", "tomli", "virtualenv (>=13.0.0)", "wheel"]
 
 [[package]]
+name = "snowflake-id"
+version = "0.0.2"
+description = "The Snowflake generator done right."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "snowflake-id-0.0.2.tar.gz", hash = "sha256:87728871afbb00ffcd99b047a7ffff2d22d26ffe2ba59ab5426ab963924bc33c"},
+    {file = "snowflake_id-0.0.2-py3-none-any.whl", hash = "sha256:b2a6d6ee0dcfa4c7546ed8a9c97e17a6d500a932cb26256a27e7aad6aff78b49"},
+]
+
+[[package]]
 name = "sqlparse"
 version = "0.4.3"
 description = "A non-validating SQL parser."
@@ -694,4 +706,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "5031ad7b721ebe15fd34e2c40aef4524c04b4847c834e63bedff49281672c5ac"
+content-hash = "652a58c283342b95b449f6f2c4de206339fd36ab082a7d2cb6a473c52e11fbdc"

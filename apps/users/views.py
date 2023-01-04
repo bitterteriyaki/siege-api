@@ -4,12 +4,12 @@ from rest_framework.status import HTTP_201_CREATED
 from rest_framework.views import APIView
 
 from apps.users.serializers import UsersSerializer
-from core.renderers import BaseJSONRenderer
+from core.renderers import UserJSONRenderer
 
 
 class UsersView(APIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (BaseJSONRenderer,)
+    renderer_classes = (UserJSONRenderer,)
     serializer_class = UsersSerializer
 
     def post(self, request):

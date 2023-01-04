@@ -12,7 +12,7 @@ from django.db.models import (
     SmallIntegerField,
 )
 
-from apps.users.backend import generate_token
+from apps.users.backend import generate_token, id_generator
 from core.models import TimestampedModel
 
 
@@ -45,10 +45,11 @@ class UserManager(BaseUserManager):
         if not available_tags:
             raise ValueError("No available tags.")
 
+        user_id = next(id_generator)
         tag = random.choice(available_tags)
         email = self.normalize_email(email)
 
-        user = self.model(username=username, email=email, tag=tag)
+        user = self.model(id=user_id, username=username, email=email, tag=tag)
         user.set_password(password)
         user.save()
 
