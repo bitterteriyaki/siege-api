@@ -42,6 +42,9 @@ class UserManager(BaseUserManager):
         used_tags = self.values_list("tag", flat=True)
         available_tags = [x for x in range(1, 10000) if x not in used_tags]
 
+        if not available_tags:
+            raise ValueError("No available tags.")
+
         tag = random.choice(available_tags)
         email = self.normalize_email(email)
 
