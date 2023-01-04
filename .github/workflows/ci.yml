@@ -35,6 +35,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           poetry install --with dev
+      - name: Run tests
+        run: |
+          black ./
+          flake8 ./
+          isort ./
       - name: Generate coverage report
         run: |
           coverage run --source="." manage.py test
