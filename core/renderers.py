@@ -8,6 +8,7 @@ class BaseJSONRenderer(JSONRenderer):
 class UserJSONRenderer(BaseJSONRenderer):
     def render(self, data, accepted_media_type, renderer_context):
         if data.get("errors") is not None:
+            renderer_context["response"].data = data["errors"]
             return super().render(data["errors"])
 
         data["id"] = str(data["id"])
