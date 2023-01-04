@@ -12,8 +12,8 @@ from django.db.models import (
     SmallIntegerField,
 )
 
+from apps.users.backend import generate_token
 from core.models import TimestampedModel
-from core.tokens import generate_token
 
 
 class UserManager(BaseUserManager):
@@ -44,9 +44,8 @@ class UserManager(BaseUserManager):
 
         tag = random.choice(available_tags)
         email = self.normalize_email(email)
-        token = generate_token(email, password)
 
-        user = self.model(username=username, email=email, tag=tag, token=token)
+        user = self.model(username=username, email=email, tag=tag)
         user.set_password(password)
         user.save()
 
@@ -85,12 +84,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # tag.
     tag = SmallIntegerField(db_index=True)
 
-    # Each user will have a unique token that will be used to identify
-    # them when they make requests to our API. This token will be
-    # generated when the user is created and will be used to identify
-    # them in the database.
-    token = CharField(max_length=255, unique=True)
-
     # When a user no longer wishes to use our platform, they may try to
     # delete there account. That's a problem for us because the data we
     # collect is valuable to us and we don't want to delete it. To solve
@@ -118,3 +111,17 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         The representation format will be `<username>#<tag>`.
         """
         return f"{self.username}#{self.tag:04}"
+
+    @property
+    def token(self):
+        """Returns a token that can be used to authenticate this user.
+        As the token has no state, we can generate it at runtime and we
+        don't need to store it in the database. This is a convenience
+        property that we can use to access the token.
+
+        Returns
+        -------
+        :class:`str`
+            A unique token for the user.
+        """
+        return generate_token(self.email, self.password)
