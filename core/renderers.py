@@ -8,7 +8,7 @@ class BaseJSONRenderer(JSONRenderer):
 class UserJSONRenderer(BaseJSONRenderer):
     def render(self, data, accepted_media_type, renderer_context):
         if data.get("errors") is not None:
-            return super().render(data, accepted_media_type, renderer_context)
+            return super().render(data["errors"])
 
         data["id"] = str(data["id"])
         data["tag"] = str(data["tag"]).zfill(4)
