@@ -39,8 +39,12 @@ jobs:
         run: |
           coverage run --source="." manage.py test
           coverage xml
-      - name: Upload coverage report
+      - name: Upload coverage report (Codecov)
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./coverage.xml
+      - name: Upload coverage report (Code Climate)
+        uses: paambaati/codeclimate-action@v3.2.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
