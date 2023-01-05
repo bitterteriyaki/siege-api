@@ -3,8 +3,9 @@ from django.db.models import DateTimeField, Model
 
 class TimestampedModel(Model):
     """An abstract base class model that provides self-updating
-    ``created_at`` and ``updated_at`` fields. This is useful for
-    tracking the creation and modification of objects.
+    `created_at` and `updated_at` fields. This is useful for tracking
+    the creation and modification of objects. This model is intended
+    to be inherited from, not used directly.
     """
 
     created_at = DateTimeField(auto_now_add=True)
