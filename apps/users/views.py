@@ -8,6 +8,12 @@ from core.renderers import UserJSONRenderer
 
 
 class UsersView(APIView):
+    """View responsible for the `/users` route.
+
+    Currently these are the endpoints available for this route:
+    - `POST /users`: creates a new user.
+    """
+
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = UsersSerializer

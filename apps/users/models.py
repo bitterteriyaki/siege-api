@@ -17,9 +17,8 @@ from core.models import TimestampedModel
 
 
 class UserManager(BaseUserManager):
-    """
-    Django requires that custom users define their own manager class. By
-    inheriting from `BaseUserManager`, we get a lot of the same code
+    """Django requires that custom users define their own manager class.
+    By inheriting from `BaseUserManager`, we get a lot of the same code
     used by Django to create a `User` for free.
 
     All we have to do is override the `create_user` function which we
@@ -27,8 +26,22 @@ class UserManager(BaseUserManager):
     """
 
     def create_user(self, username, email, password):
-        """Create and return a `User` with an email, username and
-        password.
+        """Create and return a `User` with the email, username and
+        password provided.
+
+        Parameters
+        ----------
+        username: :class:`str`
+            The username of the user.
+        email: :class:`str`
+            The e-mail address of the user.
+        password: :class:`str`
+            The password of the user.
+
+        Returns
+        -------
+        :class:`User`
+            A new user object with the provided data.
         """
         if username is None:
             raise TypeError("Users must have a username.")

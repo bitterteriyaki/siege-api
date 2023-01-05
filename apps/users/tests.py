@@ -6,6 +6,8 @@ from apps.users.models import User
 
 
 class UsersTestCase(APITestCase):
+    """Test cases for the users app."""
+
     def setUp(self):
         self.url = reverse("users:create")
         self.example = {
