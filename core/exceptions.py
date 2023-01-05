@@ -8,6 +8,8 @@ Siege. All rights reserved
 
 from rest_framework.views import exception_handler
 
+from core.renderers import BaseJSONRenderer
+
 
 def main_exception_handler(exc, context):
     """A custom exception handler that returns errors in a format that
@@ -23,10 +25,13 @@ def main_exception_handler(exc, context):
     context: Dict[:class:`str`, Any]
         The context of the exception.
     """
+    context["request"].accepted_renderer = BaseJSONRenderer()
     response = exception_handler(exc, context)
 
-    if response is not None:
-        response.data["status_code"] = response.status_code
+    if response is None:
+        return response
 
-    response.data = {"errors": response.data}
+    error = {"details": response.data, "code": response.status_code}
+    response.data = {"error": error}
+
     return response

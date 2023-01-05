@@ -17,11 +17,18 @@ class UsersSerializer(ModelSerializer):
     serializing the data returned by the same route.
 
     These are the fields that are validated:
+    - `id`: must be a string with a maximum length of 128 characters.
     - `username`: must be a string between 2 and 32 characters long.
     - `password`: must be a string between 8 and 128 characters long.
     - `email`: must be a valid e-mail address.
     - `tag`: must be a string between 1 and 4 characters long.
     """
+
+    # Set the `id` field to be read-only so that it is not included in
+    # the request and also use a `CharField` instead of an
+    # `IntegerField` so that the `id` is returned as a string instead of
+    # an integer.
+    id = CharField(max_length=128, read_only=True)
 
     # Username should have a minimum length of 2 characters and a
     # maximum length of 32 characters.
