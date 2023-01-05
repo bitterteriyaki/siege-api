@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 import random
 
 from django.contrib.auth.models import (

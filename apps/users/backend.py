@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime
