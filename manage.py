@@ -1,5 +1,11 @@
-#!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 import os
 import sys
 

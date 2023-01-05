@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 from rest_framework.views import exception_handler
 
 

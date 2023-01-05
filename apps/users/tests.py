@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 from django.urls import reverse
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.test import APITestCase

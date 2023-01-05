@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED

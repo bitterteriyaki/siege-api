@@ -1,3 +1,11 @@
+"""
+Siege. All rights reserved
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: (c) 2022-present Siege Team
+:author: Siege Team
+"""
+
 from rest_framework.serializers import CharField, ModelSerializer
 
 from apps.users.models import User
