@@ -26,7 +26,6 @@ class UserJSONRenderer(BaseJSONRenderer):
     """Renderer for the :class:`User` model. This renderer will
     render the :class:`User` model into JSON format.
 
-    - `id` will be converted to a string.
     - `tag` will be converted to a string and padded with zeros.
 
     If the `User` model has any errors, the `errors` key will be
@@ -34,11 +33,5 @@ class UserJSONRenderer(BaseJSONRenderer):
     """
 
     def render(self, data, accepted_media_type, renderer_context):
-        if data.get("errors") is not None:
-            renderer_context["response"].data = data["errors"]
-            return super().render(data["errors"])
-
-        data["id"] = str(data["id"])
-        data["tag"] = str(data["tag"]).zfill(4)
-
+        data["tag"] = data["tag"].zfill(4)
         return super().render(data, accepted_media_type, renderer_context)
