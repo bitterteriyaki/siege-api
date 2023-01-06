@@ -53,15 +53,7 @@ class UsersSerializer(ModelSerializer):
         # List all of the fields that could possibly be included in a
         # request or response, including fields specified explicitly
         # above.
-        fields = [
-            "id",
-            "username",
-            "email",
-            "password",
-            "tag",
-            "token",
-            "created_at",
-        ]
+        fields = ["id", "username", "email", "password", "tag", "token"]
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
