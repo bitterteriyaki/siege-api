@@ -29,7 +29,7 @@ def main_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     if response is None:
-        return response
+        return None
 
     error = {"details": response.data, "code": response.status_code}
     response.data = {"error": error}
