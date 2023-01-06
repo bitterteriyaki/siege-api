@@ -20,7 +20,7 @@ from django.db.models import (
     SmallIntegerField,
 )
 
-from apps.users.backend import generate_token, id_generator
+from apps.users.logic.backend import generate_token, id_generator
 from core.models import TimestampedModel
 
 
