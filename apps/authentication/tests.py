@@ -7,7 +7,11 @@ Siege. All rights reserved
 """
 
 from django.urls import reverse
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+)
 from rest_framework.test import APITestCase
 
 from apps.users.models import User
@@ -52,30 +56,30 @@ class AuthenticationTestCase(APITestCase):
         expected = "Unable to login with provided credentials."
 
         resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, HTTP_403_FORBIDDEN)
         self.assertIn("error", resp.data)
 
         error = resp.data["error"]
         self.assertIn("details", error)
 
         details = error["details"]
-        self.assertIn("non_field_errors", details)
-        self.assertIn(expected, details["non_field_errors"])
+        self.assertIn("detail", details)
+        self.assertIn(expected, details["detail"])
 
     def test_login_user_with_non_existent_email(self):
         self.example["email"] = "other@email.com"
         expected = "Unable to login with provided credentials."
 
         resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertEqual(resp.status_code, HTTP_403_FORBIDDEN)
         self.assertIn("error", resp.data)
 
         error = resp.data["error"]
         self.assertIn("details", error)
 
         details = error["details"]
-        self.assertIn("non_field_errors", details)
-        self.assertIn(expected, details["non_field_errors"])
+        self.assertIn("detail", details)
+        self.assertIn(expected, details["detail"])
 
     def test_login_user_with_empty_email(self):
         self.example["email"] = ""
