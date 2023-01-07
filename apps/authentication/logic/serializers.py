@@ -7,6 +7,7 @@ Siege. All rights reserved
 """
 
 from django.contrib.auth import authenticate
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
     CharField,
     EmailField,
@@ -51,7 +52,9 @@ class AuthenticationSerializer(Serializer):
         user = authenticate(username=email, password=password)
 
         if user is None or not user.is_active:
-            raise ValidationError("Unable to login with provided credentials.")
+            raise PermissionDenied(
+                "Unable to login with provided credentials."
+            )
 
         return {
             "email": user.email,
