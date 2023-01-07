@@ -14,12 +14,6 @@ from snowflake import SnowflakeGenerator
 
 from server.settings import SECRET_KEY
 
-# NOTE:
-# This is a dummy ID, the application will implement a real ID
-# generation mechanism (Snowflake IDs) further, this is just to show
-# how the token is generated.
-DEFAULT_ID = "123456789"
-
 
 def encode_to_b64(data):
     """Encode data to base64."""
@@ -31,19 +25,19 @@ def decode_from_b64(data):
     return urlsafe_b64decode(data.encode("utf-8")).decode("utf-8")
 
 
-def _generate_token_v1(email, password):
+def _generate_token_v1(user_id, email, password):
     signature = f"{email}.{password}".encode("utf-8")
     message = encode_to_b64(signature).encode("utf-8")
 
     key = SECRET_KEY.encode("utf-8")
 
     hmac_component = encode_to_b64(hmac.new(key, message, "sha256").digest())
-    id_part = encode_to_b64(DEFAULT_ID.encode("utf-8"))
+    id_part = encode_to_b64(user_id.encode("utf-8"))
 
     return f"v1.{id_part}.{hmac_component}"
 
 
-def generate_token(email, password, version="v1"):
+def generate_token(user_id, email, password, version="v1"):
     """Generate a unique token for the user. The first part of the token
     is the version of the token so that the application can handle
     different versions of the token. The second part of the token is the
@@ -64,6 +58,8 @@ def generate_token(email, password, version="v1"):
 
     Parameters
     ----------
+    user_id: :class:`str`
+        The ID of the user.
     email: :class:`str`
         The e-mail of the user.
     password: :class:`str`
@@ -73,16 +69,10 @@ def generate_token(email, password, version="v1"):
     -------
     :class:`str`
         A unique token for the user.
-
-    Notes
-    -----
-    The ID is a dummy ID, the application will implement a real ID
-    generation mechanism (Snowflake IDs) further, this is just to show
-    how the token is generated.
     """
     match version:
         case "v1":
-            return _generate_token_v1(email, password)
+            return _generate_token_v1(user_id, email, password)
 
 
 epoch = int(datetime(2023, 1, 1, 0, 0, 0, 0).timestamp())

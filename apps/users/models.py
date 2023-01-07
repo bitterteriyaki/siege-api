@@ -149,4 +149,4 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         :class:`str`
             A unique token for the user.
         """
-        return generate_token(self.email, self.password)
+        return generate_token(str(self.id), self.email, self.password)
