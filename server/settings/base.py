@@ -6,39 +6,33 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-import os
 from pathlib import Path
 
+from server.settings import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-up5#(s^m02$$iqsw5fl@jmeikgr*v(bnyr(8+m42m$(hxohj^t"
-)
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
+SECRET_KEY = config("DJANGO_SECRET_KEY")
 
 
 # Application definition
 
-INSTALLED_APPS = [
-    "django.contrib.admin",
+INSTALLED_APPS = (
+    # default django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "django.contrib.staticfiles",
+    # third-party apps:
     "rest_framework",
+    # local apps:
     "apps.users",
-]
+)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,24 +46,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "server.urls"
 
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
 WSGI_APPLICATION = "server.wsgi.application"
-
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
@@ -77,27 +54,22 @@ WSGI_APPLICATION = "server.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        # this is temporary, until we add a dotenv file
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "database",
-        "PORT": 5432,
+        "NAME": config("POSTGRES_DB"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_PASSWORD"),
+        "HOST": config("DJANGO_DATABASE_HOST"),
+        "PORT": config("DJANGO_DATABASE_PORT", cast=int),
+        "CONN_MAX_AGE": config("CONN_MAX_AGE", cast=int, default=60),
+        "OPTIONS": {
+            "connect_timeout": 10,
+            "options": "-c statement_timeout=15000ms",
+        },
     }
 }
 
-# NOTE:
-# This is a temporary solution to allow the tests to run on
-# GitHub Actions. It is necessary to add a way to separate the
-# environments later on.
-
-if os.getenv("GITHUB_WORKFLOW"):
-    DATABASES["default"]["NAME"] = "github-actions"
-    DATABASES["default"]["HOST"] = "localhost"
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
+
 BASE_VALIDATOR = "django.contrib.auth.password_validation"
 
 SIMILARITY_VALIDATOR = f"{BASE_VALIDATOR}.UserAttributeSimilarityValidator"
@@ -120,7 +92,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -131,12 +102,6 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
