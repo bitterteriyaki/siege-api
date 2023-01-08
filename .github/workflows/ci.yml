@@ -30,6 +30,10 @@ jobs:
           black ./
           flake8 ./
           isort ./
+      - name: Generate config files
+        run: |
+          cp config/.env.example config/.env
+          sed -i "s/edit-me/$(python -c 'from django.utils.crypto import get_random_string; print(get_random_string(64))')/g" config/.env
       - name: Generate coverage report
         run: |
           coverage run --source="." manage.py test --settings=server.settings.ci
