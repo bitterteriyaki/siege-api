@@ -10,9 +10,8 @@ import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from datetime import datetime
 
+from django.conf import settings
 from snowflake import SnowflakeGenerator
-
-from server.settings import SECRET_KEY
 
 
 def encode_to_b64(data):
@@ -29,7 +28,7 @@ def _generate_token_v1(user_id, email, password):
     signature = f"{email}.{password}".encode("utf-8")
     message = encode_to_b64(signature).encode("utf-8")
 
-    key = SECRET_KEY.encode("utf-8")
+    key = settings.SECRET_KEY.encode("utf-8")
 
     hmac_component = encode_to_b64(hmac.new(key, message, "sha256").digest())
     id_part = encode_to_b64(user_id.encode("utf-8"))
