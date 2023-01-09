@@ -24,6 +24,11 @@ class UsersTestCase(APITestCase):
             "password": "password",
         }
 
+    def setup_seeding(self):
+        for i in range(1, 10_000):
+            self.example["email"] = f"user{i}@email.com"
+            User.objects.create_user(**self.example, tag=i)
+
     def test_create_user_sucessfully(self):
         resp = self.client.post(self.url, self.example)
         user = User.objects.get(email=self.example["email"])
@@ -226,3 +231,18 @@ class UsersTestCase(APITestCase):
         details = error["details"]
         self.assertIn("password", details)
         self.assertIn(expected, details["password"])
+
+    def test_create_user_no_available_tags(self):
+        self.setup_seeding()
+        self.example["email"] = "another.user@email.com"
+        expected = "No available tags."
+
+        resp = self.client.post(self.url, self.example)
+        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
+        self.assertIn("error", resp.data)
+
+        error = resp.data["error"]
+        self.assertIn("details", error)
+
+        details = error["details"]
+        self.assertIn(expected, details)

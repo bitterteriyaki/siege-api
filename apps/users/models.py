@@ -13,7 +13,13 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-from django.db.models import BooleanField, CharField, EmailField
+from django.db.models import (
+    BooleanField,
+    CharField,
+    EmailField,
+    SmallIntegerField,
+)
+from rest_framework.exceptions import ValidationError
 
 from apps.users.logic.backend import generate_token
 from core.models import TimestampedModel
@@ -28,7 +34,7 @@ class UserManager(BaseUserManager):
     will use to create `User` objects.
     """
 
-    def create_user(self, username, email, password):
+    def create_user(self, username, email, password, tag=None):
         """Create and return a `User` with the email, username and
         password provided.
 
@@ -46,13 +52,20 @@ class UserManager(BaseUserManager):
         :class:`User`
             A new user object with the provided data.
         """
-        used_tags = self.values_list("tag", flat=True)
-        available_tags = [x for x in range(1, 10000) if x not in used_tags]
+        if not tag:
+            used_tags = self.values_list("tag", flat=True)
+            available_tags = [
+                x for x in range(1, 10_000) if x not in used_tags
+            ]
 
-        if not available_tags:
-            raise ValueError("No available tags.")
+            if not available_tags:
+                raise ValidationError("No available tags.")
 
-        tag = random.choice(available_tags)
+            tag = random.choice(available_tags)
+        else:
+            if self.filter(tag=tag).exists():
+                raise ValidationError("User with this tag already exists.")
+
         email = self.normalize_email(email)
 
         user = self.model(username=username, email=email, tag=tag)
@@ -79,7 +92,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # have the same username. The tag will be an integer from 0 to 9999.
     # Users with the same username will not be able to have the same
     # tag.
-    tag = CharField(max_length=4)
+    tag = SmallIntegerField()
 
     # When a user no longer wishes to use our platform, they may try to
     # delete there account. That's a problem for us because the data we
