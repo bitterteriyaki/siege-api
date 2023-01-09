@@ -46,15 +46,6 @@ class UserManager(BaseUserManager):
         :class:`User`
             A new user object with the provided data.
         """
-        if username is None:
-            raise TypeError("Users must have a username.")
-
-        if email is None:
-            raise TypeError("Users must have an e-mail address.")
-
-        if password is None:
-            raise TypeError("Users must have a password.")
-
         used_tags = self.values_list("tag", flat=True)
         available_tags = [x for x in range(1, 10000) if x not in used_tags]
 
