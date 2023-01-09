@@ -13,14 +13,9 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin,
 )
-from django.db.models import (
-    BooleanField,
-    CharField,
-    EmailField,
-    SmallIntegerField,
-)
+from django.db.models import BooleanField, CharField, EmailField
 
-from apps.users.logic.backend import generate_token, id_generator
+from apps.users.logic.backend import generate_token
 from core.models import TimestampedModel
 
 
@@ -66,25 +61,11 @@ class UserManager(BaseUserManager):
         if not available_tags:
             raise ValueError("No available tags.")
 
-        user_id = next(id_generator)
         tag = random.choice(available_tags)
         email = self.normalize_email(email)
 
-        user = self.model(id=user_id, username=username, email=email, tag=tag)
+        user = self.model(username=username, email=email, tag=tag)
         user.set_password(password)
-        user.save()
-
-        return user
-
-    def create_superuser(self, username, email, password):
-        """Create and return a `User` with superuser powers.
-
-        Superuser powers means that this use is an admin that can do
-        anything they want.
-        """
-        user = self.create_user(username, email, password)
-        user.is_superuser = True
-        user.is_staff = True
         user.save()
 
         return user
@@ -94,7 +75,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # Each `User` needs a human-readable unique identifier that we can
     # use to represent the `User` in the UI. We want to index this
     # column in the database to improve lookup performance.
-    username = CharField(db_index=True, max_length=255)
+    username = CharField(db_index=True, max_length=32)
 
     # We also need a way to contact the user and a way for the user to
     # identify themselves when logging in. Since we need an e-mail
@@ -107,7 +88,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # have the same username. The tag will be an integer from 0 to 9999.
     # Users with the same username will not be able to have the same
     # tag.
-    tag = SmallIntegerField(db_index=True)
+    tag = CharField(max_length=4)
 
     # When a user no longer wishes to use our platform, they may try to
     # delete there account. That's a problem for us because the data we
@@ -116,11 +97,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # account instead of letting them delete it. That way they won't
     # show up on the site anymore, but we can still analyze the data.
     is_active = BooleanField(default=True)
-
-    # The `is_staff` flag is expected by Django to determine who can and
-    # cannot log into the Django admin site. For most users, this flag
-    # will always be falsed.
-    is_staff = BooleanField(default=False)
 
     # The `USERNAME_FIELD` property tells us which field we will use to
     # login. In this case, we want that to be the email field.

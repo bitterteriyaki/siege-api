@@ -10,7 +10,6 @@ python = "^3.11"
 django = "^4.1.4"
 psycopg2 = "^2.9.5"
 djangorestframework = "^3.14.0"
-snowflake-id = "^0.0.2"
 python-decouple = "^3.6"
 
 

@@ -8,10 +8,8 @@ Siege. All rights reserved
 
 import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
-from datetime import datetime
 
 from django.conf import settings
-from snowflake import SnowflakeGenerator
 
 
 def encode_to_b64(data):
@@ -72,7 +70,3 @@ def generate_token(user_id, email, password, version="v1"):
     match version:
         case "v1":
             return _generate_token_v1(user_id, email, password)
-
-
-epoch = int(datetime(2023, 1, 1, 0, 0, 0, 0).timestamp())
-id_generator = SnowflakeGenerator(42, epoch=epoch)
