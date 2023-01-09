@@ -98,12 +98,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # manage objects of this type.
     objects = UserManager()
 
-    def __str__(self):
-        """Return a human readable representation of the model instance.
-        The representation format will be `<username>#<tag>`.
-        """
-        return f"{self.username}#{self.tag:04}"
-
     @property
     def token(self):
         """Returns a token that can be used to authenticate this user.
