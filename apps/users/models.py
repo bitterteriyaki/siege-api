@@ -46,6 +46,9 @@ class UserManager(BaseUserManager):
             The e-mail address of the user.
         password: :class:`str`
             The password of the user.
+        tag: :class:`int`
+            The tag of the user. If not provided, a random tag between
+            1 and 9999 will be generated.
 
         Returns
         -------
