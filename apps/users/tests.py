@@ -7,6 +7,7 @@ Siege. All rights reserved
 """
 
 from django.urls import reverse
+from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 from rest_framework.test import APITestCase
 
@@ -246,3 +247,9 @@ class UsersTestCase(APITestCase):
 
         details = error["details"]
         self.assertIn(expected, details)
+
+    def test_create_user_with_existing_tag(self):
+        User.objects.create_user(**self.example, tag=1)
+        self.assertRaises(
+            ValidationError, User.objects.create_user, **self.example, tag=1
+        )
