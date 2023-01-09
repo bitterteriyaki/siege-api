@@ -6,21 +6,12 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.conf import settings
-from django.contrib import admin
 from django.urls import include, re_path
+
+auth = "authentication"
 
 urlpatterns = (
     # apps:
     re_path(r"^api/", include("apps.users.urls", namespace="users")),
-    re_path(
-        r"^api/",
-        include("apps.authentication.urls", namespace="authentication"),
-    ),
+    re_path(r"^api/", include(f"apps.{auth}.urls", namespace=auth)),
 )
-
-if settings.DEBUG:
-    urlpatterns += (
-        # django-admin:
-        re_path("^admin/", admin.site.urls),
-    )
