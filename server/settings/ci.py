@@ -6,12 +6,10 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from server.settings.base import *
+from server.settings.development import *
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
-
-DEBUG = True
 
 
 # Application definition
@@ -19,5 +17,3 @@ DEBUG = True
 DATABASES["default"] = {
     "ENGINE": "django.db.backends.sqlite3",
 }
-
-PASSWORD_HASHERS = ("django.contrib.auth.hashers.MD5PasswordHasher",)
