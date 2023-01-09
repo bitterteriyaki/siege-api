@@ -115,15 +115,21 @@ AUTH_USER_MODEL = "users.User"
 # https://www.django-rest-framework.org/api-guide/settings/
 
 DEFAULT_VERSIONING_CLASS = "rest_framework.versioning.URLPathVersioning"
+
 TEST_REQUEST_DEFAULT_FORMAT = "json"
+
 EXCEPTION_HANDLER = "core.exceptions.main_exception_handler"
-DEFAULT_RENDERER_CLASSES = [
-    "core.renderers.BaseJSONRenderer",
-]
+
+DEFAULT_RENDERER_CLASSES = ("core.renderers.BaseJSONRenderer",)
+
+DEFAULT_AUTHENTICATION_CLASSES = (
+    "apps.authentication.logic.backend.TokenAuthentication",
+)
 
 REST_FRAMEWORK = {
     "DEFAULT_VERSIONING_CLASS": DEFAULT_VERSIONING_CLASS,
     "TEST_REQUEST_DEFAULT_FORMAT": TEST_REQUEST_DEFAULT_FORMAT,
     "EXCEPTION_HANDLER": EXCEPTION_HANDLER,
     "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
+    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
 }
