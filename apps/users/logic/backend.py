@@ -44,7 +44,7 @@ def decode_from_b64(data):
     :class:`str`
         The decoded data.
     """
-    return urlsafe_b64decode(data + "==").decode("utf-8")
+    return urlsafe_b64decode(data + "==")
 
 
 def _generate_token_v1(user_id, email, password):
@@ -103,7 +103,7 @@ def _validate_token_v1(id_part, hmac_component):
     # to avoid circular imports
     from apps.users.models import User
 
-    user_id = decode_from_b64(id_part)
+    user_id = decode_from_b64(id_part).decode("utf-8")
 
     try:
         user = User.objects.get(id=user_id)
@@ -113,7 +113,7 @@ def _validate_token_v1(id_part, hmac_component):
     _, expected = _generate_token_v1(user_id, user.email, user.password)
 
     expected = decode_from_b64(expected)
-    hmac_component = urlsafe_b64decode(hmac_component)
+    hmac_component = decode_from_b64(hmac_component)
 
     if not hmac.compare_digest(hmac_component, expected):
         raise ValidationError("Invalid token.")
