@@ -12,6 +12,7 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
 )
 from rest_framework.test import APITestCase
 
@@ -301,3 +302,19 @@ class UsersTestCase(APITestCase):
         self.assertEqual(resp.data["id"], another_user.id)
         self.assertEqual(resp.data["username"], another_user.username)
         self.assertEqual(resp.data["tag"], f"{another_user.tag:04}")
+
+    def test_get_user_no_token(self):
+        url = reverse("users:get", kwargs={"target": self.user.id})
+        expected = "Authentication credentials were not provided."
+
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+
+        self.assertIn("error", resp.data)
+        error = resp.data["error"]
+
+        self.assertIn("details", error)
+        details = error["details"]
+
+        self.assertIn("detail", details)
+        self.assertEqual(expected, details["detail"])
