@@ -8,14 +8,19 @@ Siege. All rights reserved
 
 from django.urls import reverse
 from rest_framework.exceptions import ValidationError
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_401_UNAUTHORIZED,
+)
 from rest_framework.test import APITestCase
 
 from apps.users.models import User
 
 
-class UsersTestCase(APITestCase):
-    """Test cases for the users app."""
+class SelfUserTestCase(APITestCase):
+    """Test cases for `/users` route."""
 
     def setUp(self):
         self.url = reverse("users:create")
@@ -252,3 +257,45 @@ class UsersTestCase(APITestCase):
         self.assertRaises(
             ValidationError, User.objects.create_user, **self.example, tag=1
         )
+
+
+class UsersTestCase(APITestCase):
+    """Test cases for `/users/<user_id>` route."""
+
+    def setUp(self):
+        example = {
+            "username": "user",
+            "email": "user@email.com",
+            "password": "password",
+        }
+        self.user = User.objects.create_user(**example)
+
+    def test_get_self_with_valid_credentials(self):
+        url = reverse("users:get", kwargs={"target": "me"})
+        self.client.force_authenticate(self.user)
+
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, HTTP_200_OK)
+
+        self.assertIn("id", resp.data)
+        self.assertIn("username", resp.data)
+        self.assertIn("tag", resp.data)
+
+        self.assertEqual(resp.data["id"], self.user.id)
+        self.assertEqual(resp.data["username"], self.user.username)
+        self.assertEqual(resp.data["tag"], f"{self.user.tag:04}")
+
+    def test_get_self_with_no_credentials(self):
+        url = reverse("users:get", kwargs={"target": "me"})
+        expected = "Authentication credentials were not provided."
+
+        resp = self.client.get(url)
+        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertIn("error", resp.data)
+
+        error = resp.data["error"]
+        self.assertIn("details", error)
+
+        details = error["details"]
+        self.assertIn("detail", details)
+        self.assertIn(expected, details["detail"])
