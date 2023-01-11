@@ -35,7 +35,6 @@ class UsersTestCase(APITestCase):
         user = User.objects.get(email=self.example["email"])
 
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
-        self.assertEqual(resp.data["email"], user.email)
         self.assertEqual(resp.data["token"], user.token)
 
     def test_create_user_with_invalid_email(self):
@@ -85,7 +84,7 @@ class UsersTestCase(APITestCase):
 
     def test_create_user_with_existing_email(self):
         self.client.post(self.url, self.example)
-        expected = "user with this email already exists."
+        expected = "This email is already in use."
 
         resp = self.client.post(self.url, self.example)
         self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)

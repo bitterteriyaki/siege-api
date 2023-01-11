@@ -7,6 +7,7 @@ Siege. All rights reserved
 """
 
 from rest_framework.serializers import CharField, EmailField, ModelSerializer
+from rest_framework.validators import UniqueValidator
 
 from apps.users.models import User
 
@@ -29,7 +30,16 @@ class SelfUserSerializer(ModelSerializer):
 
     # The e-mail should be a valid e-mail address and it is also
     # write-only so that it is not returned in the response.
-    email = EmailField(max_length=255, write_only=True)
+    email = EmailField(
+        max_length=255,
+        write_only=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="This email is already in use.",
+            )
+        ],
+    )
 
     # The password should have a minimum length of 8 characters and a
     # maximum length of 128 characters, and it is also write-only so
