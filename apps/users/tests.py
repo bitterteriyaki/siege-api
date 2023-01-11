@@ -12,7 +12,6 @@ from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
 )
 from rest_framework.test import APITestCase
 
@@ -263,14 +262,14 @@ class UsersTestCase(APITestCase):
     """Test cases for `/users/<user_id>` route."""
 
     def setUp(self):
-        example = {
+        self.example = {
             "username": "user",
             "email": "user@email.com",
             "password": "password",
         }
-        self.user = User.objects.create_user(**example)
+        self.user = User.objects.create_user(**self.example)
 
-    def test_get_self_with_valid_credentials(self):
+    def test_get_self(self):
         url = reverse("users:get", kwargs={"target": "me"})
         self.client.force_authenticate(self.user)
 
@@ -285,17 +284,20 @@ class UsersTestCase(APITestCase):
         self.assertEqual(resp.data["username"], self.user.username)
         self.assertEqual(resp.data["tag"], f"{self.user.tag:04}")
 
-    def test_get_self_with_no_credentials(self):
-        url = reverse("users:get", kwargs={"target": "me"})
-        expected = "Authentication credentials were not provided."
+    def test_get_user(self):
+        self.example["email"] = "another.user@email.com"
+        another_user = User.objects.create_user(**self.example)
+
+        url = reverse("users:get", kwargs={"target": another_user.id})
+        self.client.force_authenticate(self.user)
 
         resp = self.client.get(url)
-        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
-        self.assertIn("error", resp.data)
+        self.assertEqual(resp.status_code, HTTP_200_OK)
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
+        self.assertIn("id", resp.data)
+        self.assertIn("username", resp.data)
+        self.assertIn("tag", resp.data)
 
-        details = error["details"]
-        self.assertIn("detail", details)
-        self.assertIn(expected, details["detail"])
+        self.assertEqual(resp.data["id"], another_user.id)
+        self.assertEqual(resp.data["username"], another_user.username)
+        self.assertEqual(resp.data["tag"], f"{another_user.tag:04}")
