@@ -7,14 +7,15 @@ Siege. All rights reserved
 """
 
 from django.urls import reverse
+from rest_framework.exceptions import ValidationError
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
-    HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
 )
 from rest_framework.test import APITestCase
 
+from apps.users.logic.backend import validate_token
 from apps.users.models import User
 
 
@@ -184,22 +185,21 @@ class TokenAuthenticationTestCase(APITestCase):
         }
         self.user = User.objects.create_user(**self.example)
 
-    def test_invalid_token_one_term(self):
-        url = reverse("users:get", kwargs={"target": "me"})
-        resp = self.client.get(url, HTTP_AUTHENTICATION="Token")
+    def test_valid_token_v1(self):
+        validated = validate_token(self.user.token)
+        expected = (self.user, self.user.token)
+        self.assertTupleEqual(validated, expected)
 
-        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+    def test_invalid_token_v1_one_term_wrong_version(self):
+        self.assertRaises(ValidationError, validate_token, "invalid-token")
 
-    def test_invalid_token_three_terms(self):
-        url = reverse("users:get", kwargs={"target": "me"})
-        token = f"Token {self.user.token} another-term"
+    def test_invalid_token_v1_many_terms_wrong_version(self):
+        token = "invalid.token.format.here"
+        self.assertRaises(ValidationError, validate_token, token)
 
-        resp = self.client.get(url, HTTP_AUTHENTICATION=token)
-        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+    def test_invalid_token_v1_one_term_correct_version(self):
+        self.assertRaises(ValidationError, validate_token, "v1.invalid-token")
 
-    def test_invalid_token_wrong_prefix(self):
-        url = reverse("users:get", kwargs={"target": "me"})
-        token = f"Tokenn {self.user.token}"
-
-        resp = self.client.get(url, HTTP_AUTHENTICATION=token)
-        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+    def test_invalid_token_v1_many_terms_correct_version(self):
+        token = "v1.invalid.token.format.here"
+        self.assertRaises(ValidationError, validate_token, token)

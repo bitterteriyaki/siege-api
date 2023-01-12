@@ -139,10 +139,10 @@ def validate_token(token):
     List[:class:`User`, :class:`str`]
         A list containing the user and the token.
     """
-    try:
-        version, *rest = token.split(".")
-    except ValueError as exc:
-        raise ValidationError("Invalid token.") from exc
+    version, *rest = token.split(".")
+
+    if not len(rest):
+        raise ValidationError("Invalid token.")
 
     match version:
         case "v1":
@@ -152,3 +152,5 @@ def validate_token(token):
                 raise ValidationError("Invalid token.") from exc
 
             return _validate_token_v1(id_part, hmac_component)
+        case _:
+            raise ValidationError("Invalid token.")
