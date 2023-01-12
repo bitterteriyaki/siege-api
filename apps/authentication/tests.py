@@ -196,3 +196,10 @@ class TokenAuthenticationTestCase(APITestCase):
 
         resp = self.client.get(url, HTTP_AUTHENTICATION=token)
         self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
+
+    def test_invalid_token_wrong_prefix(self):
+        url = reverse("users:get", kwargs={"target": "me"})
+        token = f"Tokenn {self.user.token}"
+
+        resp = self.client.get(url, HTTP_AUTHENTICATION=token)
+        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
