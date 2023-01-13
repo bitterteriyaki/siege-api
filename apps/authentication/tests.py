@@ -15,7 +15,11 @@ from rest_framework.status import (
 )
 from rest_framework.test import APITestCase
 
-from apps.users.logic.backend import validate_token
+from apps.users.logic.backend import (
+    encode_to_b64,
+    generate_token,
+    validate_token,
+)
 from apps.users.models import User
 
 
@@ -202,4 +206,23 @@ class TokenAuthenticationTestCase(APITestCase):
 
     def test_invalid_token_v1_many_terms_correct_version(self):
         token = "v1.invalid.token.format.here"
+        self.assertRaises(ValidationError, validate_token, token)
+
+    def test_invalid_token_v1_invalid_user_id(self):
+        token = "v1.test.invalid-token"
+        self.assertRaises(ValidationError, validate_token, token)
+
+    def test_invalid_token_v1_invalid_user(self):
+        user_id = encode_to_b64(str(self.user.id + 1).encode("utf-8"))
+        token = f"v1.{user_id}.invalid-token"
+        self.assertRaises(ValidationError, validate_token, token)
+
+    def test_invalid_token_v1_invalid_signature(self):
+        user_id = encode_to_b64(str(self.user.id).encode("utf-8"))
+        token = f"v1.{user_id}.invalid-token"
+        self.assertRaises(ValidationError, validate_token, token)
+
+    def test_invalid_token_v1_wrong_signature(self):
+        email = "another@email.com"
+        token = generate_token(str(self.user.id), email, self.user.password)
         self.assertRaises(ValidationError, validate_token, token)

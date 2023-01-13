@@ -8,6 +8,7 @@ Siege. All rights reserved
 
 import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
+from binascii import Error as BinasciiError
 
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
@@ -103,17 +104,19 @@ def _validate_token_v1(id_part, hmac_component):
     # to avoid circular imports
     from apps.users.models import User
 
-    user_id = decode_from_b64(id_part).decode("utf-8")
-
     try:
+        user_id = decode_from_b64(id_part).decode("utf-8")
         user = User.objects.get(id=user_id)
-    except User.DoesNotExist as exc:
+    except (UnicodeDecodeError, User.DoesNotExist) as exc:
         raise ValidationError("Invalid token.") from exc
 
     _, expected = _generate_token_v1(user_id, user.email, user.password)
 
-    expected = decode_from_b64(expected)
-    hmac_component = decode_from_b64(hmac_component)
+    try:
+        expected = decode_from_b64(expected)
+        hmac_component = decode_from_b64(hmac_component)
+    except (UnicodeDecodeError, BinasciiError) as exc:
+        raise ValidationError("Invalid token.") from exc
 
     if not hmac.compare_digest(hmac_component, expected):
         raise ValidationError("Invalid token.")
