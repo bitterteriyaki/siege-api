@@ -64,3 +64,14 @@ class TokenAuthentication(BaseAuthentication):
             return None
 
         return validate_token(token)
+
+    def authenticate_header(self, request):
+        """This method is called when the client does not provide a
+        valid token in the `Authorization` header of the request.
+
+        This method returns a string that is sent to the client as the
+        value of the `WWW-Authenticate` header. This header tells the
+        client what type of authentication is required and how to
+        authenticate.
+        """
+        return self.header_prefix

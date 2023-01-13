@@ -13,5 +13,5 @@ from apps.authentication.views import LoginView
 app_name = "authentication"
 
 urlpatterns = [
-    re_path("^v1/auth/login/$", LoginView.as_view(), name="login"),
+    re_path(r"^v1/auth/login/?$", LoginView.as_view(), name="login"),
 ]
