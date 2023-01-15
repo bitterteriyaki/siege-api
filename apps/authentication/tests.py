@@ -24,7 +24,7 @@ from apps.users.models import User
 
 
 class AuthenticationTestCase(APITestCase):
-    """Test cases for the authentication app."""
+    """Test cases for `/auth` route."""
 
     def setUp(self):
         self.example = {"email": "user@email.com", "password": "password"}
