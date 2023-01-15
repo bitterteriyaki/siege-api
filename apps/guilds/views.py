@@ -40,7 +40,11 @@ class GuildsView(APIView):
 
 
 class GuildRetrieveView(RetrieveAPIView):
-    """ """
+    """View responsible for the `/guilds/<guild_id>` route.
+
+    Currently these are the endpoints available for this route:
+    - `GET /guilds/<guild_id>`: retrieves a guild.
+    """
 
     permission_classes = (IsAuthenticated,)
     renderer_classes = (BaseJSONRenderer,)
