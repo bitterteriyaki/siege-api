@@ -32,6 +32,8 @@ INSTALLED_APPS = (
     "rest_framework",
     # local apps:
     "apps.users",
+    "apps.authentication",
+    "apps.guilds",
 )
 
 MIDDLEWARE = [
