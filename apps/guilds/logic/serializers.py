@@ -13,7 +13,8 @@ from rest_framework.serializers import (
     SerializerMethodField,
 )
 
-from apps.guilds.models import Guild, GuildMember
+from apps.guilds.models import Guild
+from apps.members.models import Member
 from apps.users.logic.serializers import UsersSerializer
 
 
@@ -28,7 +29,7 @@ class GuildMemberSerializer(ModelSerializer):
     joined_at = DateTimeField(read_only=True)
 
     class Meta:
-        model = GuildMember
+        model = Member
         # List all of the fields that could possibly be included in a
         # request or response, including fields specified explicitly
         # above.

@@ -14,7 +14,8 @@ from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.views import APIView
 
 from apps.guilds.logic.serializers import GuildSerializer
-from apps.guilds.models import Guild, GuildMember
+from apps.guilds.models import Guild
+from apps.members.models import Member
 from core.renderers import BaseJSONRenderer
 
 
@@ -36,7 +37,7 @@ class GuildsView(APIView):
         serializer.is_valid(raise_exception=True)
         guild = serializer.save()
 
-        member = GuildMember(guild=guild, user=request.user)
+        member = Member(guild=guild, user=request.user)
         member.save()
 
         return Response(serializer.data, status=HTTP_201_CREATED)
