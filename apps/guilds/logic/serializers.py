@@ -6,38 +6,10 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.serializers import (
-    DateTimeField,
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-    SerializerMethodField,
-)
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
 from apps.guilds.models import Guild
-from apps.members.models import Member
-from apps.users.logic.serializers import UsersSerializer
-
-
-class GuildMemberSerializer(ModelSerializer):
-    """Serializer for the `/guilds/<guild_id>/members` route. This
-    serializer is responsible for validating the data sent to the route
-    and for serializing the data returned by the same route. This
-    serializer also handles the creation of guild members.
-    """
-
-    user = SerializerMethodField()
-    joined_at = DateTimeField(read_only=True)
-
-    class Meta:
-        model = Member
-        # List all of the fields that could possibly be included in a
-        # request or response, including fields specified explicitly
-        # above.
-        fields = ("nick", "user", "joined_at")
-        fields_read_only = "__all__"
-
-    def get_user(self, member):
-        return UsersSerializer(member.user).data
+from apps.members.logic.serializers import MemberSerializer
 
 
 class GuildSerializer(ModelSerializer):
@@ -52,7 +24,7 @@ class GuildSerializer(ModelSerializer):
     """
 
     owner_id = PrimaryKeyRelatedField(read_only=True)
-    members = GuildMemberSerializer(
+    members = MemberSerializer(
         many=True, read_only=True, source="guildmember_set"
     )
 
