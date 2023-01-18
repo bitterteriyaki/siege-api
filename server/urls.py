@@ -15,5 +15,6 @@ urlpatterns = (
         r"^api/",
         include("apps.authentication.urls", namespace="authentication"),
     ),
-    re_path("^api/", include("apps.guilds.urls", namespace="guilds")),
+    re_path(r"^api/", include("apps.guilds.urls", namespace="guilds")),
+    re_path(r"^api/", include("apps.members.urls", namespace="members")),
 )
