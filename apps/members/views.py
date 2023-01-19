@@ -6,13 +6,12 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from rest_framework.views import APIView
 
-from apps.guilds.models import Guild
+from apps.guilds.logic.utils import get_guild
 from apps.members.logic.serializers import MemberSerializer
 from core.renderers import BaseJSONRenderer
 
@@ -30,12 +29,6 @@ class MembersView(APIView):
     serializer_class = MemberSerializer
 
     def get(self, request, guild_id):
-        try:
-            guild = Guild.objects.get(id=guild_id)
-        except Guild.DoesNotExist as exc:
-            raise NotFound("Guild not found.") from exc
-        else:
-            serializer = self.serializer_class(
-                guild.member_set.all(), many=True
-            )
-            return Response(serializer.data, status=HTTP_200_OK)
+        guild = get_guild(guild_id)
+        serializer = self.serializer_class(guild.member_set.all(), many=True)
+        return Response(serializer.data, status=HTTP_200_OK)
