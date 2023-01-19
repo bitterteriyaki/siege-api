@@ -7,28 +7,22 @@ Siege. All rights reserved
 """
 
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
-from rest_framework.views import APIView
+from rest_framework.viewsets import ReadOnlyModelViewSet
 
 from apps.guilds.logic.utils import get_guild
 from apps.members.logic.serializers import MemberSerializer
 from core.renderers import BaseJSONRenderer
 
 
-class MembersView(APIView):
-    """View responsible for the `/guilds/<guild_id>/members` route.
-
-    Currently these are the endpoints available for this route:
-    - `GET /guilds/<guild_id>/members`: retrieves all members of a
-      guild.
+class MembersViewSet(ReadOnlyModelViewSet):
+    """Viewset responsible for the `/guilds/<guild_id>/members` route.
+    This route is used to retrieve all members of a guild.
     """
 
     permission_classes = (IsAuthenticated,)
     renderer_classes = (BaseJSONRenderer,)
     serializer_class = MemberSerializer
 
-    def get(self, request, guild_id):
-        guild = get_guild(guild_id)
-        serializer = self.serializer_class(guild.member_set.all(), many=True)
-        return Response(serializer.data, status=HTTP_200_OK)
+    def get_queryset(self):
+        guild = get_guild(self.kwargs["guild_id"])
+        return guild.member_set.all()

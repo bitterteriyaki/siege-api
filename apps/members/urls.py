@@ -6,16 +6,15 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.urls import re_path
+from rest_framework.routers import DefaultRouter
 
-from apps.members.views import MembersView
+from apps.members.views import MembersViewSet
 
 app_name = "members"
 
-urlpatterns = [
-    re_path(
-        r"^v1/guilds/(?P<guild_id>\d+)/members/?$",
-        MembersView.as_view(),
-        name="list",
-    ),
-]
+router = DefaultRouter()
+router.register(
+    r"v1/guilds/(?P<guild_id>\d+)/members", MembersViewSet, basename="members"
+)
+
+urlpatterns = router.urls
