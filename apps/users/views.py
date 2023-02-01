@@ -36,7 +36,11 @@ class SelfUserView(APIView):
 
 
 class UsersView(APIView):
-    """ """
+    """View responsible for the `/users/<target>` route.
+
+    Currently these are the endpoints available for this route:
+    - `GET /users/<target>`: gets the user with the given ID.
+    """
 
     permission_classes = (IsAuthenticated,)
     renderer_classes = (UserJSONRenderer,)
