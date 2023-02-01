@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "api"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Proof of Concept for API development in Python."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
@@ -10,7 +10,7 @@ python = "^3.11"
 django = "^4.1.4"
 psycopg2 = "^2.9.5"
 djangorestframework = "^3.14.0"
-snowflake-id = "^0.0.2"
+python-decouple = "^3.6"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -31,7 +31,7 @@ line_length = 79
 
 # TODO: add a custom changelog template
 [tool.commitizen]
-version = "0.2.0"
+version = "0.3.0"
 version_files = ["pyproject.toml"]
 update_changelog_on_bump = true
 changelog_incremental = true

@@ -6,16 +6,17 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
 from rest_framework.views import APIView
 
-from apps.users.logic.serializers import UsersSerializer
-from core.renderers import UserJSONRenderer
+from apps.users.logic.serializers import SelfUserSerializer, UsersSerializer
+from apps.users.models import User
+from core.renderers import BaseJSONRenderer, UserJSONRenderer
 
 
-class UsersView(APIView):
+class SelfUserView(APIView):
     """View responsible for the `/users` route.
 
     Currently these are the endpoints available for this route:
@@ -23,8 +24,8 @@ class UsersView(APIView):
     """
 
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
-    serializer_class = UsersSerializer
+    renderer_classes = (BaseJSONRenderer,)
+    serializer_class = SelfUserSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -32,3 +33,21 @@ class UsersView(APIView):
         serializer.save()
 
         return Response(serializer.data, status=HTTP_201_CREATED)
+
+
+class UsersView(APIView):
+    """View responsible for the `/users/<target>` route.
+
+    Currently these are the endpoints available for this route:
+    - `GET /users/<target>`: gets the user with the given ID.
+    """
+
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = UsersSerializer
+
+    def get(self, request, target):
+        user = request.user if target == "me" else User.objects.get(id=target)
+        serializer = self.serializer_class(user)
+
+        return Response(serializer.data, status=HTTP_200_OK)

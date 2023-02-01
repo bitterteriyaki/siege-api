@@ -6,33 +6,40 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.serializers import CharField, ModelSerializer
+from rest_framework.serializers import CharField, EmailField, ModelSerializer
+from rest_framework.validators import UniqueValidator
 
 from apps.users.models import User
 
 
-class UsersSerializer(ModelSerializer):
+class SelfUserSerializer(ModelSerializer):
     """Serializer for the `/users` route. This serializer is responsible
     for validating the data sent to the `/users` route and for
     serializing the data returned by the same route.
 
     These are the fields that are validated:
-    - `id`: must be a string with a maximum length of 128 characters.
     - `username`: must be a string between 2 and 32 characters long.
     - `password`: must be a string between 8 and 128 characters long.
     - `email`: must be a valid e-mail address.
-    - `tag`: must be a string between 1 and 4 characters long.
+    - `token`: must be a string between 1 and 255 characters long.
     """
-
-    # Set the `id` field to be read-only so that it is not included in
-    # the request and also use a `CharField` instead of an
-    # `IntegerField` so that the `id` is returned as a string instead of
-    # an integer.
-    id = CharField(max_length=128, read_only=True)
 
     # Username should have a minimum length of 2 characters and a
     # maximum length of 32 characters.
-    username = CharField(min_length=2, max_length=32)
+    username = CharField(min_length=2, max_length=32, write_only=True)
+
+    # The e-mail should be a valid e-mail address and it is also
+    # write-only so that it is not returned in the response.
+    email = EmailField(
+        max_length=255,
+        write_only=True,
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="This email is already in use.",
+            )
+        ],
+    )
 
     # The password should have a minimum length of 8 characters and a
     # maximum length of 128 characters, and it is also write-only so
@@ -44,24 +51,35 @@ class UsersSerializer(ModelSerializer):
     # in the request.
     token = CharField(max_length=255, read_only=True)
 
-    # The user should not be able to set the tag, so it is also
-    # read-only.
-    tag = CharField(max_length=4, read_only=True)
+    class Meta:
+        model = User
+        # List all of the fields that could possibly be included in a
+        # request or response, including fields specified explicitly
+        # above.
+        fields = ("username", "email", "password", "token")
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)
+
+
+class UsersSerializer(ModelSerializer):
+    """Serializer for the `/users/<user_id>` route. This serializer is
+    responsible for validating the data sent to the `/users/<user_id>`
+    route and for serializing the data returned by the same route. All
+    of the fields are read-only.
+
+    These are the fields that are validated:
+    - `tag`: must be a string between 1 and 4 characters long.
+    """
+
+    # The user tag should be a string with a maximum length of 4
+    # characters.
+    tag = CharField(max_length=4)
 
     class Meta:
         model = User
         # List all of the fields that could possibly be included in a
         # request or response, including fields specified explicitly
         # above.
-        fields = [
-            "id",
-            "username",
-            "email",
-            "password",
-            "tag",
-            "token",
-            "created_at",
-        ]
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        fields = ("id", "username", "tag", "created_at")
+        fields_only_fields = "__all__"

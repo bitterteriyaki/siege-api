@@ -6,10 +6,15 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.contrib import admin
 from django.urls import include, re_path
 
-urlpatterns = [
-    re_path(r"^admin/", admin.site.urls),
+urlpatterns = (
+    # apps:
     re_path(r"^api/", include("apps.users.urls", namespace="users")),
-]
+    re_path(
+        r"^api/",
+        include("apps.authentication.urls", namespace="authentication"),
+    ),
+    re_path(r"^api/", include("apps.guilds.urls", namespace="guilds")),
+    re_path(r"^api/", include("apps.members.urls", namespace="members")),
+)

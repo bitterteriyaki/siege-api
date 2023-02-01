@@ -1,26 +1,49 @@
+# Default compose file for development and production.
+# Should be used directly in development.
+# Automatically loads `docker-compose.override.yml` if it exists.
+# No extra steps required.
+# Should be used together with `docker/docker-compose.prod.yml`
+# in production.
+
+version: '3.9'
+
 services:
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      - database
-    environment:
-      # this is temporary, until we add a dotenv file
-      - POSTGRES_NAME=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
   database:
-    image: postgres
+    image: 'postgres:15.1-alpine'
+    restart: unless-stopped
     volumes:
       - postgresql:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+    networks:
+      - webnet
+    env_file: ./config/.env
+  web:
+    <<: &web
+      # image name is changed in production:
+      image: 'siege:dev'
+      build:
+        target: development_build
+        context: .
+        dockerfile: ./docker/django/Dockerfile
+        args:
+          DJANGO_ENV: development
+        cache_from:
+          - "siege:dev"
+          - "siege:latest"
+          - "*"
+      depends_on:
+        - database
+      networks:
+        - webnet
+      env_file:
+        - ./config/.env
+      environment:
+        DJANGO_DATABASE_HOST: database
+
+    command: python -Wd manage.py runserver 0.0.0.0:8000
+
+networks:
+  # network for your internals, use it by default:
+  webnet:
 
 volumes:
   postgresql:

@@ -28,7 +28,7 @@ def main_exception_handler(exc, context):
     context["request"].accepted_renderer = BaseJSONRenderer()
     response = exception_handler(exc, context)
 
-    if response is None:
+    if not response:
         return None
 
     error = {"details": response.data, "code": response.status_code}
