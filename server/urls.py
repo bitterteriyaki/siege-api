@@ -17,4 +17,5 @@ urlpatterns = (
     ),
     re_path(r"^api/", include("apps.guilds.urls", namespace="guilds")),
     re_path(r"^api/", include("apps.members.urls", namespace="members")),
+    re_path(r"^api/", include("apps.channels.urls", namespace="channels")),
 )
