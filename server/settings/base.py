@@ -35,6 +35,7 @@ INSTALLED_APPS = (
     "apps.authentication",
     "apps.guilds",
     "apps.members",
+    "apps.channels",
 )
 
 MIDDLEWARE = [
