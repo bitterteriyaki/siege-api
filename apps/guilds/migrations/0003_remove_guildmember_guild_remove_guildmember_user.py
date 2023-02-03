@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("guilds", "0002_alter_guild_owner_id_guildmember_guild_members"),
     ]

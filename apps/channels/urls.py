@@ -13,5 +13,9 @@ from apps.channels.views import ChannelsView
 app_name = "channels"
 
 urlpatterns = [
-    re_path(r"^v1/guilds/(?P<guild_id>\d+)/channels/?$", ChannelsView.as_view(), name="create"),
+    re_path(
+        r"^v1/guilds/(?P<guild_id>\d+)/channels/?$",
+        ChannelsView.as_view(),
+        name="create",
+    ),
 ]

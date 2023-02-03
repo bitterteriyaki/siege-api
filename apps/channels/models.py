@@ -6,11 +6,10 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.db.models import CharField, ForeignKey, CASCADE
-
-from core.models import TimestampedModel
+from django.db.models import CASCADE, CharField, ForeignKey
 
 from apps.guilds.models import Guild
+from core.models import TimestampedModel
 
 
 class Channel(TimestampedModel):

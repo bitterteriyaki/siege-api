@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("guilds", "0003_remove_guildmember_guild_remove_guildmember_user"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

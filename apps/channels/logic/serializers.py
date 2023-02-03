@@ -29,4 +29,6 @@ class ChannelSerializer(ModelSerializer):
         fields = ("id", "name", "description")
 
     def create(self, validated_data):
-        return Channel.objects.create(guild=get_guild(self.context["guild_id"]), **validated_data)
+        return Channel.objects.create(
+            guild=get_guild(self.context["guild_id"]), **validated_data
+        )

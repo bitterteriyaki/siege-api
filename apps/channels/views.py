@@ -6,10 +6,10 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
+from rest_framework.views import APIView
 
 from apps.channels.logic.serializers import ChannelSerializer
 from core.renderers import BaseJSONRenderer
@@ -34,7 +34,3 @@ class ChannelsView(APIView):
         serializer.save()
 
         return Response(serializer.data, status=HTTP_201_CREATED)
-
-
-
-        
