@@ -30,3 +30,23 @@ python manage.py migrate
 # running the application
 python manage.py runserver 0.0.0.0:8000
 ```
+
+## Authors
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/bitterteriyaki">
+        <img src="https://avatars.githubusercontent.com/u/82721542" width="100px;" />
+        <br>
+        <sub>
+          <b>@bitterteriyaki</b>
+        </sub>
+      </a>
+      <br>
+      <sub>
+        Maintainer
+      </br>
+    </td>
+  </tr>
+</table>
