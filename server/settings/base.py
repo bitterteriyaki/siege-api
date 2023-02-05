@@ -6,37 +6,35 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from pathlib import Path
-
 from server.settings import config
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
+# Here's a list of settings available in Django core and their default
+# values.
+# https://docs.djangoproject.com/en/4.1/ref/settings/#core-settings
 
 SECRET_KEY = config("DJANGO_SECRET_KEY")
 
+# We don't want to append a slash to the end of URLs, so we disable it.
+# This is because we want to use the same URLs schema for both the API
+# and the front-end.
 
-# Application definition
+APPEND_SLASH = False
 
-INSTALLED_APPS = (
-    # default django apps:
+INSTALLED_APPS = [
+    # Default Django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    # third-party apps:
+    # Third-party apps:
     "rest_framework",
-    # local apps:
+    # Local apps:
     "apps.users",
     "apps.authentication",
     "apps.guilds",
     "apps.members",
     "apps.channels",
-)
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -52,7 +50,8 @@ ROOT_URLCONF = "server.urls"
 
 WSGI_APPLICATION = "server.wsgi.application"
 
-# Database
+# A nested dictionary whose contents map a database alias to a
+# dictionary containing the options for an individual database.
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
 DATABASES = {
@@ -68,32 +67,20 @@ DATABASES = {
             "connect_timeout": 10,
             "options": "-c statement_timeout=15000ms",
         },
-    }
+    },
 }
 
-# Password validation
+# The list of validators that are used to check the strength of user's
+# passwords. See Password validation for more details.
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
 BASE_VALIDATOR = "django.contrib.auth.password_validation"
 
-SIMILARITY_VALIDATOR = f"{BASE_VALIDATOR}.UserAttributeSimilarityValidator"
-MINIMUM_LENGTH_VALIDATOR = f"{BASE_VALIDATOR}.MinimumLengthValidator"
-COMMON_PASSWORD_VALIDATOR = f"{BASE_VALIDATOR}.CommonPasswordValidator"
-NUMERIC_PASSWORD_VALIDATOR = f"{BASE_VALIDATOR}.NumericPasswordValidator"
-
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": SIMILARITY_VALIDATOR,
-    },
-    {
-        "NAME": MINIMUM_LENGTH_VALIDATOR,
-    },
-    {
-        "NAME": COMMON_PASSWORD_VALIDATOR,
-    },
-    {
-        "NAME": NUMERIC_PASSWORD_VALIDATOR,
-    },
+    {"NAME": f"{BASE_VALIDATOR}.UserAttributeSimilarityValidator"},
+    {"NAME": f"{BASE_VALIDATOR}.MinimumLengthValidator"},
+    {"NAME": f"{BASE_VALIDATOR}.CommonPasswordValidator"},
+    {"NAME": f"{BASE_VALIDATOR}.NumericPasswordValidator"},
 ]
 
 # Internationalization
@@ -112,28 +99,22 @@ USE_TZ = True
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Tell Django about the custom `User` model we created.
+# The model to use to represent a `User`.
+# https://docs.djangoproject.com/en/4.1/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
+
 
 # Django Rest Framework settings
 # https://www.django-rest-framework.org/api-guide/settings/
 
-DEFAULT_VERSIONING_CLASS = "rest_framework.versioning.URLPathVersioning"
-
-TEST_REQUEST_DEFAULT_FORMAT = "json"
-
-EXCEPTION_HANDLER = "core.exceptions.main_exception_handler"
-
-DEFAULT_RENDERER_CLASSES = ("core.renderers.BaseJSONRenderer",)
-
-DEFAULT_AUTHENTICATION_CLASSES = (
-    "apps.authentication.logic.backend.TokenAuthentication",
-)
-
 REST_FRAMEWORK = {
-    "DEFAULT_VERSIONING_CLASS": DEFAULT_VERSIONING_CLASS,
-    "TEST_REQUEST_DEFAULT_FORMAT": TEST_REQUEST_DEFAULT_FORMAT,
-    "EXCEPTION_HANDLER": EXCEPTION_HANDLER,
-    "DEFAULT_RENDERER_CLASSES": DEFAULT_RENDERER_CLASSES,
-    "DEFAULT_AUTHENTICATION_CLASSES": DEFAULT_AUTHENTICATION_CLASSES,
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    "EXCEPTION_HANDLER": "core.exceptions.main_exception_handler",
+    "DEFAULT_RENDERER_CLASSES": [
+        "core.renderers.BaseJSONRenderer",
+    ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "apps.authentication.logic.backend.TokenAuthentication",
+    ],
 }
