@@ -6,6 +6,8 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import cast
+
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
@@ -15,8 +17,10 @@ from rest_framework.serializers import (
     ValidationError,
 )
 
+from apps.users.models import User
 
-class AuthenticationSerializer(Serializer):
+
+class AuthenticationSerializer(Serializer[User]):
     """Serializer for the `/auth/login` route. This serializer is
     responsible for validating the data sent to the route and
     serializing the data returned by the same route.
@@ -39,7 +43,7 @@ class AuthenticationSerializer(Serializer):
     # in the request.
     token = CharField(max_length=255, read_only=True)
 
-    def validate(self, data):
+    def validate(self, data: dict[str, str]) -> dict[str, str]:
         email = data.get("email", None)
         password = data.get("password", None)
 
@@ -49,7 +53,7 @@ class AuthenticationSerializer(Serializer):
         if password is None:
             raise ValidationError("A password is required to login.")
 
-        user = authenticate(username=email, password=password)
+        user = cast(User, authenticate(username=email, password=password))
 
         if user is None or not user.is_active:
             raise PermissionDenied(

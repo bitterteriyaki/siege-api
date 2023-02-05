@@ -6,15 +6,21 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from __future__ import annotations
+
 import hmac
 from base64 import urlsafe_b64decode, urlsafe_b64encode
 from binascii import Error as BinasciiError
+from typing import TYPE_CHECKING, Literal
 
 from django.conf import settings
 from rest_framework.exceptions import ValidationError
 
+if TYPE_CHECKING:
+    from apps.users.models import User
 
-def encode_to_b64(data):
+
+def encode_to_b64(data: bytes) -> str:
     """Encode data to base64. The data is encoded using the URL-safe
     base64 encoding scheme and the padding is removed.
 
@@ -31,7 +37,7 @@ def encode_to_b64(data):
     return urlsafe_b64encode(data).decode("utf-8").strip("=")
 
 
-def decode_from_b64(data):
+def decode_from_b64(data: str) -> bytes:
     """Decode data from base64. The data is decoded using the URL-safe
     base64 encoding scheme and the padding is added.
 
@@ -48,7 +54,9 @@ def decode_from_b64(data):
     return urlsafe_b64decode(data + "==")
 
 
-def _generate_token_v1(user_id, email, password):
+def _generate_token_v1(
+    user_id: str, email: str, password: str
+) -> tuple[str, str]:
     signature = f"{email}.{password}".encode("utf-8")
     message = encode_to_b64(signature).encode("utf-8")
 
@@ -60,7 +68,12 @@ def _generate_token_v1(user_id, email, password):
     return (id_part, hmac_component)
 
 
-def generate_token(user_id, email, password, version="v1"):
+Version = Literal["v1"]
+
+
+def generate_token(
+    user_id: str, email: str, password: str, version: Version = "v1"
+) -> str:
     """Generate a unique token for the user. The first part of the token
     is the version of the token so that the application can handle
     different versions of the token. The second part of the token is the
@@ -100,7 +113,7 @@ def generate_token(user_id, email, password, version="v1"):
     return ".".join([version, *token])
 
 
-def _validate_token_v1(id_part, hmac_component):
+def _validate_token_v1(id_part: str, hmac_component: str) -> tuple[User, str]:
     # to avoid circular imports
     from apps.users.models import User
 
@@ -113,18 +126,18 @@ def _validate_token_v1(id_part, hmac_component):
     _, expected = _generate_token_v1(user_id, user.email, user.password)
 
     try:
-        expected = decode_from_b64(expected)
-        hmac_component = decode_from_b64(hmac_component)
+        decoded_expected = decode_from_b64(expected)
+        decoded_hmac_component = decode_from_b64(hmac_component)
     except (UnicodeDecodeError, BinasciiError) as exc:
         raise ValidationError("Invalid token.") from exc
 
-    if not hmac.compare_digest(hmac_component, expected):
+    if not hmac.compare_digest(decoded_hmac_component, decoded_expected):
         raise ValidationError("Invalid token.")
 
     return (user, user.token)
 
 
-def validate_token(token):
+def validate_token(token: str) -> tuple[User, str]:
     """Validate the token. The token is validated using the following
     steps:
 

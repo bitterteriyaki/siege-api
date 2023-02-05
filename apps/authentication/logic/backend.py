@@ -10,8 +10,10 @@ from rest_framework.authentication import (
     BaseAuthentication,
     get_authorization_header,
 )
+from rest_framework.request import Request
 
 from apps.users.logic.backend import validate_token
+from apps.users.models import User
 
 
 class TokenAuthentication(BaseAuthentication):
@@ -28,7 +30,7 @@ class TokenAuthentication(BaseAuthentication):
 
     header_prefix = "Token"
 
-    def authenticate(self, request):
+    def authenticate(self, request: Request) -> tuple[User, str] | None:
         """This method is called on every request, regardless of whether
         the endpoint requires authentication
 
@@ -48,7 +50,6 @@ class TokenAuthentication(BaseAuthentication):
         simple raise the :class:`AuthenticationFailed` exception and let
         Django REST Framework handle the rest.
         """
-        request.user = None
         auth_header = get_authorization_header(request).split()
 
         if not auth_header:
@@ -65,7 +66,7 @@ class TokenAuthentication(BaseAuthentication):
 
         return validate_token(token)
 
-    def authenticate_header(self, request):
+    def authenticate_header(self, request: Request) -> str:
         """This method is called when the client does not provide a
         valid token in the `Authorization` header of the request.
 

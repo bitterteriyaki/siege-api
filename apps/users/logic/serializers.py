@@ -6,13 +6,15 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import Any
+
 from rest_framework.serializers import CharField, EmailField, ModelSerializer
 from rest_framework.validators import UniqueValidator
 
 from apps.users.models import User
 
 
-class SelfUserSerializer(ModelSerializer):
+class SelfUserSerializer(ModelSerializer[User]):
     """Serializer for the `/users` route. This serializer is responsible
     for validating the data sent to the `/users` route and for
     serializing the data returned by the same route.
@@ -58,11 +60,11 @@ class SelfUserSerializer(ModelSerializer):
         # above.
         fields = ("username", "email", "password", "token")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> User:
         return User.objects.create_user(**validated_data)
 
 
-class UsersSerializer(ModelSerializer):
+class UsersSerializer(ModelSerializer[User]):
     """Serializer for the `/users/<user_id>` route. This serializer is
     responsible for validating the data sent to the `/users/<user_id>`
     route and for serializing the data returned by the same route. All
