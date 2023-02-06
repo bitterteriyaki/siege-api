@@ -6,6 +6,8 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from __future__ import annotations
+
 import random
 
 from django.contrib.auth.models import (
@@ -25,7 +27,7 @@ from apps.users.logic.backend import generate_token
 from core.models import TimestampedModel
 
 
-class UserManager(BaseUserManager):
+class UserManager(BaseUserManager["User"]):
     """Django requires that custom users define their own manager class.
     By inheriting from `BaseUserManager`, we get a lot of the same code
     used by Django to create a `User` for free.
@@ -34,7 +36,9 @@ class UserManager(BaseUserManager):
     will use to create `User` objects.
     """
 
-    def create_user(self, username, email, password, tag=None):
+    def create_user(
+        self, username: str, email: str, password: str, tag: int | None = None
+    ) -> User:
         """Create and return a `User` with the email, username and
         password provided.
 
@@ -79,6 +83,11 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
+    # Every user has a unique ID that is used to identify them in the
+    # database. In this case, we are just telling Mypy that the type
+    # of the `id` field is an integer.
+    id: int
+
     # Each `User` needs a human-readable unique identifier that we can
     # use to represent the `User` in the UI. We want to index this
     # column in the database to improve lookup performance.
@@ -115,7 +124,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     objects = UserManager()
 
     @property
-    def token(self):
+    def token(self) -> str:
         """Returns a token that can be used to authenticate this user.
         As the token has no state, we can generate it at runtime and we
         don't need to store it in the database. This is a convenience

@@ -7,6 +7,7 @@ Siege. All rights reserved
 """
 
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.views import APIView
@@ -26,7 +27,7 @@ class ChannelsView(APIView):
     renderer_classes = (BaseJSONRenderer,)
     serializer_class = ChannelSerializer
 
-    def post(self, request, guild_id):
+    def post(self, request: Request, guild_id: int) -> Response:
         context = {"guild_id": guild_id}
 
         serializer = self.serializer_class(data=request.data, context=context)

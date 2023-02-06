@@ -12,7 +12,7 @@ from apps.channels.models import Channel
 from apps.guilds.logic.utils import get_guild
 
 
-class ChannelSerializer(ModelSerializer):
+class ChannelSerializer(ModelSerializer[Channel]):
     """Serializer for the `/channels` route. This serializer is
     responsible for validating the data sent to the `/channels` route
     and for serializing the data returned by the same route. All of the
@@ -28,7 +28,7 @@ class ChannelSerializer(ModelSerializer):
         model = Channel
         fields = ("id", "name", "description")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, str]) -> Channel:
         return Channel.objects.create(
             guild=get_guild(self.context["guild_id"]), **validated_data
         )

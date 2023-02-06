@@ -6,6 +6,8 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import Any, Mapping
+
 from rest_framework.renderers import JSONRenderer
 
 
@@ -32,6 +34,11 @@ class UserJSONRenderer(BaseJSONRenderer):
     rendered instead of the `User` model.
     """
 
-    def render(self, data, accepted_media_type, renderer_context):
+    def render(
+        self,
+        data: Any,
+        accepted_media_type: str | None = None,
+        renderer_context: Mapping[str, Any] | None = None,
+    ) -> Any:
         data["tag"] = data["tag"].zfill(4)
         return super().render(data, accepted_media_type, renderer_context)

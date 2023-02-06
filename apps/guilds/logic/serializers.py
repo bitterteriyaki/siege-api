@@ -6,13 +6,20 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import TYPE_CHECKING
+
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
 from apps.guilds.models import Guild
 from apps.members.logic.serializers import MemberSerializer
 
+if TYPE_CHECKING:
+    GuildOwnerField = PrimaryKeyRelatedField[Guild]
+else:
+    GuildOwnerField = PrimaryKeyRelatedField
 
-class GuildSerializer(ModelSerializer):
+
+class GuildSerializer(ModelSerializer[Guild]):
     """Serializer for the `/guilds` route. This serializer is
     responsible for validating the data sent to the `/guilds` route
     and for serializing the data returned by the same route. This
@@ -23,7 +30,7 @@ class GuildSerializer(ModelSerializer):
     - `description`: must be a string between 0 and 255 characters.
     """
 
-    owner_id = PrimaryKeyRelatedField(read_only=True)
+    owner_id = GuildOwnerField(read_only=True)
     members = MemberSerializer(
         many=True, read_only=True, source="guildmember_set"
     )
@@ -35,6 +42,6 @@ class GuildSerializer(ModelSerializer):
         # above.
         fields = ("id", "name", "owner_id", "description", "members")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, str]) -> Guild:
         validated_data["owner_id"] = self.context["request"].user
         return super().create(validated_data)

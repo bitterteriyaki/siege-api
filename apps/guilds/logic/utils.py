@@ -11,7 +11,7 @@ from rest_framework.exceptions import NotFound
 from apps.guilds.models import Guild
 
 
-def get_guild(guild_id):
+def get_guild(guild_id: int) -> Guild:
     """Get a guild by its ID. If the guild does not exist, raise a
     :class:`NotFound` exception.
 

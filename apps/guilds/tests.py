@@ -22,7 +22,7 @@ from apps.users.models import User
 class GuildsTestCase(APITestCase):
     """Test cases for `/guilds` route."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         credentials = {
             "username": "user",
             "password": "password",
@@ -31,7 +31,7 @@ class GuildsTestCase(APITestCase):
 
         self.user = User.objects.create_user(**credentials)
 
-    def test_create_guild_sucessfully(self):
+    def test_create_guild_sucessfully(self) -> None:
         url = reverse("guilds:create")
         self.client.force_authenticate(user=self.user)
 
@@ -48,7 +48,7 @@ class GuildsTestCase(APITestCase):
         self.assertEqual(resp.data["description"], data["description"])
         self.assertEqual(resp.data["owner_id"], self.user.id)
 
-    def test_create_guild_without_authentication(self):
+    def test_create_guild_without_authentication(self) -> None:
         url = reverse("guilds:create")
         expected = "Authentication credentials were not provided."
 
@@ -65,7 +65,7 @@ class GuildsTestCase(APITestCase):
         self.assertIn("detail", details)
         self.assertIn(expected, details["detail"])
 
-    def test_create_guild_without_name(self):
+    def test_create_guild_without_name(self) -> None:
         url = reverse("guilds:create")
         expected = "This field is required."
 
@@ -84,7 +84,7 @@ class GuildsTestCase(APITestCase):
         self.assertIn("name", details)
         self.assertIn(expected, details["name"])
 
-    def test_get_guild_sucessfully(self):
+    def test_get_guild_sucessfully(self) -> None:
         url = reverse("guilds:create")
         self.client.force_authenticate(user=self.user)
 
@@ -108,7 +108,7 @@ class GuildsTestCase(APITestCase):
         self.assertEqual(resp.data["description"], data["description"])
         self.assertEqual(resp.data["owner_id"], self.user.id)
 
-    def test_get_non_existing_guild(self):
+    def test_get_non_existing_guild(self) -> None:
         url = reverse("guilds:get", kwargs={"guild_id": 1})
         self.client.force_authenticate(user=self.user)
 
