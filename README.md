@@ -25,7 +25,7 @@ $ cd api
 $ poetry install
 
 # creating the `.env` file
-$ ./create-env.sh
+$ ./scripts/create-env.sh
 
 # performing database migrations
 $ python manage.py migrate
