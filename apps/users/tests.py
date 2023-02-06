@@ -21,7 +21,7 @@ from apps.users.models import User
 class SelfUserTestCase(APITestCase):
     """Test cases for `/users` route."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.url = reverse("users:create")
         self.example = {
             "username": "user",
@@ -29,19 +29,19 @@ class SelfUserTestCase(APITestCase):
             "password": "password",
         }
 
-    def setup_seeding(self):
+    def setup_seeding(self) -> None:
         for i in range(1, 10_000):
             self.example["email"] = f"user{i}@email.com"
             User.objects.create_user(**self.example, tag=i)
 
-    def test_create_user_sucessfully(self):
+    def test_create_user_sucessfully(self) -> None:
         resp = self.client.post(self.url, self.example)
         user = User.objects.get(email=self.example["email"])
 
         self.assertEqual(resp.status_code, HTTP_201_CREATED)
         self.assertEqual(resp.data["token"], user.token)
 
-    def test_create_user_with_invalid_email(self):
+    def test_create_user_with_invalid_email(self) -> None:
         self.example["email"] = "invalid_email"
         expected = "Enter a valid email address."
 
@@ -56,7 +56,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("email", details)
         self.assertIn(expected, details["email"])
 
-    def test_create_user_with_short_password(self):
+    def test_create_user_with_short_password(self) -> None:
         self.example["password"] = "abc"
         expected = "Ensure this field has at least 8 characters."
 
@@ -71,7 +71,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("password", details)
         self.assertIn(expected, details["password"])
 
-    def test_create_user_with_long_password(self):
+    def test_create_user_with_long_password(self) -> None:
         self.example["password"] = "abc" * 100
         expected = "Ensure this field has no more than 128 characters."
 
@@ -86,7 +86,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("password", details)
         self.assertIn(expected, details["password"])
 
-    def test_create_user_with_existing_email(self):
+    def test_create_user_with_existing_email(self) -> None:
         self.client.post(self.url, self.example)
         expected = "This email is already in use."
 
@@ -101,7 +101,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("email", details)
         self.assertIn(expected, details["email"])
 
-    def test_create_user_with_long_email(self):
+    def test_create_user_with_long_email(self) -> None:
         self.example["email"] = "a" * 1000 + "@email.com"
         expected = "Ensure this field has no more than 255 characters."
 
@@ -116,7 +116,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("email", details)
         self.assertIn(expected, details["email"])
 
-    def test_create_user_with_short_username(self):
+    def test_create_user_with_short_username(self) -> None:
         self.example["username"] = "a"
         expected = "Ensure this field has at least 2 characters."
 
@@ -131,7 +131,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("username", details)
         self.assertIn(expected, details["username"])
 
-    def test_create_user_with_long_username(self):
+    def test_create_user_with_long_username(self) -> None:
         self.example["username"] = "a" * 100
         expected = "Ensure this field has no more than 32 characters."
 
@@ -146,7 +146,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("username", details)
         self.assertIn(expected, details["username"])
 
-    def test_create_user_missing_email(self):
+    def test_create_user_missing_email(self) -> None:
         del self.example["email"]
         expected = "This field is required."
 
@@ -161,7 +161,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("email", details)
         self.assertIn(expected, details["email"])
 
-    def test_create_user_missing_password(self):
+    def test_create_user_missing_password(self) -> None:
         del self.example["password"]
         expected = "This field is required."
 
@@ -176,7 +176,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("password", details)
         self.assertIn(expected, details["password"])
 
-    def test_create_user_missing_username(self):
+    def test_create_user_missing_username(self) -> None:
         del self.example["username"]
         expected = "This field is required."
 
@@ -191,7 +191,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("username", details)
         self.assertIn(expected, details["username"])
 
-    def test_create_user_with_null_username(self):
+    def test_create_user_with_null_username(self) -> None:
         self.example["username"] = None
         expected = "This field may not be null."
 
@@ -206,7 +206,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("username", details)
         self.assertIn(expected, details["username"])
 
-    def test_create_user_with_null_email(self):
+    def test_create_user_with_null_email(self) -> None:
         self.example["email"] = None
         expected = "This field may not be null."
 
@@ -221,7 +221,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("email", details)
         self.assertIn(expected, details["email"])
 
-    def test_create_user_with_null_password(self):
+    def test_create_user_with_null_password(self) -> None:
         self.example["password"] = None
         expected = "This field may not be null."
 
@@ -236,7 +236,7 @@ class SelfUserTestCase(APITestCase):
         self.assertIn("password", details)
         self.assertIn(expected, details["password"])
 
-    def test_create_user_no_available_tags(self):
+    def test_create_user_no_available_tags(self) -> None:
         self.setup_seeding()
         self.example["email"] = "another.user@email.com"
         expected = "No available tags."
@@ -251,7 +251,7 @@ class SelfUserTestCase(APITestCase):
         details = error["details"]
         self.assertIn(expected, details)
 
-    def test_create_user_with_existing_tag(self):
+    def test_create_user_with_existing_tag(self) -> None:
         User.objects.create_user(**self.example, tag=1)
         self.assertRaises(
             ValidationError, User.objects.create_user, **self.example, tag=1
@@ -261,7 +261,7 @@ class SelfUserTestCase(APITestCase):
 class UsersTestCase(APITestCase):
     """Test cases for `/users/<user_id>` route."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         self.example = {
             "username": "user",
             "email": "user@email.com",
@@ -269,7 +269,7 @@ class UsersTestCase(APITestCase):
         }
         self.user = User.objects.create_user(**self.example)
 
-    def test_get_self(self):
+    def test_get_self(self) -> None:
         url = reverse("users:get", kwargs={"target": "me"})
         self.client.force_authenticate(self.user)
 
@@ -284,7 +284,7 @@ class UsersTestCase(APITestCase):
         self.assertEqual(resp.data["username"], self.user.username)
         self.assertEqual(resp.data["tag"], f"{self.user.tag:04}")
 
-    def test_get_user(self):
+    def test_get_user(self) -> None:
         self.example["email"] = "another.user@email.com"
         another_user = User.objects.create_user(**self.example)
 
