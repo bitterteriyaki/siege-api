@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "api"
 version = "0.3.0"
-description = "A Proof of Concept for API development in Python."
+description = "Repository for Siege API Service."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
@@ -32,7 +32,6 @@ line-length = 79
 profile = "black"
 line_length = 79
 
-# TODO: add a custom changelog template
 [tool.commitizen]
 version = "0.3.0"
 version_files = ["pyproject.toml"]
