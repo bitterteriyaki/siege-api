@@ -16,19 +16,47 @@ See the [Poetry installation guide](https://python-poetry.org/docs/#installation
 
 ```sh
 # cloning the repository
-git clone https://github.com/siegeapp/api.git
+$ git clone https://github.com/siegeapp/api.git
 
 # entering the cloned repository folder
-cd api
+$ cd api
 
 # installing the dependencies
-poetry install
+$ poetry install
+
+# creating the `.env` file
+$ ./create-env.sh
 
 # performing database migrations
-python manage.py migrate
+$ python manage.py migrate
 
 # running the application
-python manage.py runserver 0.0.0.0:8000
+$ python manage.py runserver 0.0.0.0:8000
+```
+
+If you prefer, there is also a Docker (and Docker Compose) image in the repository:
+```sh
+# build the image and start the application
+docker compose build
+docker compose up
+```
+If everything has run correctly, you will be able to access the API via the URL `http://localhost:8000`.
+
+## Conventions & Code Quality
+
+### Git Hooks
+
+This project has [Git Hooks](https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks) (through the [`pre-commit`](https://pre-commit.com) library) that help with development and ensure code quality. It is highly recommended that you use these hooks!
+
+```sh
+# install all needed hook types
+$ pre-commit install \
+  --hook-type commit-msg \
+  --hook-type pre-push \
+  --hook-type pre-commit
+
+# it's done! now you can program normally, and when
+# you go to commit something, the hooks will run.
 ```
 
 ## Authors
