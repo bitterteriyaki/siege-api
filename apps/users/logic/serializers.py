@@ -8,6 +8,7 @@ Siege. All rights reserved
 
 from typing import Any
 
+from django.utils.translation import gettext as _
 from rest_framework.serializers import CharField, EmailField, ModelSerializer
 from rest_framework.validators import UniqueValidator
 
@@ -38,7 +39,7 @@ class SelfUserSerializer(ModelSerializer[User]):
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="This email is already in use.",
+                message=_("This email is already in use."),
             )
         ],
     )

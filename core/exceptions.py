@@ -28,16 +28,16 @@ def main_exception_handler(
     ----------
     exc: :class:`Exception`
         The exception that was raised.
-    context: Dict[:class:`str`, Any]
+    context: Mapping[:class:`str`, Any]
         The context of the exception.
     """
     context["request"].accepted_renderer = BaseJSONRenderer()
     response = exception_handler(exc, context)
 
-    if not response:
+    if response is None:
         return None
 
-    error = {"details": response.data, "code": response.status_code}
-    response.data = {"error": error}
+    data = {"status": response.status_code, "errors": response.data}
+    response.data = data
 
     return response
