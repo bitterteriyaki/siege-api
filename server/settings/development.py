@@ -19,7 +19,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
-
 # In development, we don't need a secure password hasher. We can use
 # MD5 instead, this is because we don't need to worry about security
 # in development. However, we should use a secure password hasher in
