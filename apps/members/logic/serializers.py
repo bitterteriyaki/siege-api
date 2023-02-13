@@ -9,7 +9,7 @@ Siege. All rights reserved
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
 
 from apps.members.models import Member
-from apps.users.logic.serializers import UsersSerializer
+from apps.users.logic.serializers import UserSerializer
 
 
 class MemberSerializer(ModelSerializer):
@@ -30,4 +30,4 @@ class MemberSerializer(ModelSerializer):
         fields_read_only = "__all__"
 
     def get_user(self, member):
-        return UsersSerializer(member.user).data
+        return UserSerializer(member.user).data

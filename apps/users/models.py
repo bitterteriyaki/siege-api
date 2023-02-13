@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import random
 
+from django.conf import settings
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -21,9 +22,10 @@ from django.db.models import (
     EmailField,
     SmallIntegerField,
 )
+from django.utils.translation import gettext as _
+from itsdangerous import URLSafeSerializer
 from rest_framework.exceptions import ValidationError
 
-from apps.users.logic.backend import generate_token
 from core.models import TimestampedModel
 
 
@@ -36,9 +38,7 @@ class UserManager(BaseUserManager["User"]):
     will use to create `User` objects.
     """
 
-    def create_user(
-        self, username: str, email: str, password: str, tag: int | None = None
-    ) -> User:
+    def create_user(self, username: str, email: str, password: str) -> User:
         """Create and return a `User` with the email, username and
         password provided.
 
@@ -50,29 +50,20 @@ class UserManager(BaseUserManager["User"]):
             The e-mail address of the user.
         password: :class:`str`
             The password of the user.
-        tag: :class:`int`
-            The tag of the user. If not provided, a random tag between
-            1 and 9999 will be generated.
 
         Returns
         -------
         :class:`User`
             A new user object with the provided data.
         """
-        if not tag:
-            used_tags = self.values_list("tag", flat=True)
-            available_tags = [
-                x for x in range(1, 10_000) if x not in used_tags
-            ]
+        used_tags = self.values_list("tag", flat=True)
+        available_tags = [x for x in range(1, 10_000) if x not in used_tags]
 
-            if not available_tags:
-                raise ValidationError("No available tags.")
+        # If there are no available tags, raise an error.
+        if not available_tags:
+            raise ValidationError({"username": [_("No available tags.")]})
 
-            tag = random.choice(available_tags)
-        else:
-            if self.filter(tag=tag).exists():
-                raise ValidationError("User with this tag already exists.")
-
+        tag = random.choice(available_tags)
         email = self.normalize_email(email)
 
         user = self.model(username=username, email=email, tag=tag)
@@ -135,4 +126,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         :class:`str`
             A unique token for the user.
         """
-        return generate_token(str(self.id), self.email, self.password)
+        serializer = URLSafeSerializer(settings.SECRET_KEY, salt="auth")
+        token = serializer.dumps(self.id)
+
+        if isinstance(token, bytes):
+            token = token.decode("utf-8")
+
+        return token

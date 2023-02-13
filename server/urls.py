@@ -6,11 +6,11 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.urls import include, re_path
+from django.urls import include, path, re_path
 
 urlpatterns = (
     # apps:
-    re_path(r"^api/", include("apps.users.urls", namespace="users")),
+    path("", include("apps.users.urls", namespace="users")),
     re_path(
         r"^api/",
         include("apps.authentication.urls", namespace="authentication"),

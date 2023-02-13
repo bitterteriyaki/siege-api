@@ -6,13 +6,16 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from django.conf import settings
+from django.utils.translation import gettext as _
+from itsdangerous import BadSignature, URLSafeSerializer
 from rest_framework.authentication import (
     BaseAuthentication,
     get_authorization_header,
 )
+from rest_framework.exceptions import ValidationError
 from rest_framework.request import Request
 
-from apps.users.logic.backend import validate_token
 from apps.users.models import User
 
 
@@ -40,7 +43,7 @@ class TokenAuthentication(BaseAuthentication):
         token. In this case, the request will be processed as an
         unauthenticated request.
 
-        2) Tuple[:class:`User`, :class:`str`] is returned when the
+        2) tuple[:class:`User`, :class:`str`] is returned when the
         authentication was sucessful. Where this tuple is a pair of
         the user that was authenticated and the token that was used to
         authenticate the user.
@@ -55,7 +58,7 @@ class TokenAuthentication(BaseAuthentication):
         if not auth_header:
             return None
 
-        if len(auth_header) == 1 or len(auth_header) > 2:
+        if len(auth_header) != 2:
             return None
 
         prefix = auth_header[0].decode("utf-8")
@@ -64,15 +67,50 @@ class TokenAuthentication(BaseAuthentication):
         if prefix != self.header_prefix:
             return None
 
-        return validate_token(token)
+        return self.validate_token(token)
 
     def authenticate_header(self, request: Request) -> str:
         """This method is called when the client does not provide a
         valid token in the `Authorization` header of the request.
 
         This method returns a string that is sent to the client as the
-        value of the `WWW-Authenticate` header. This header tells the
+        value of the `Authorization` header. This header tells the
         client what type of authentication is required and how to
         authenticate.
         """
         return self.header_prefix
+
+    def validate_token(self, token: str) -> tuple[User, str]:
+        """Validate the given token and return the user that the token
+        belongs to. If the token is invalid or the user does not exist,
+        then an exception is raised.
+
+        Parameters
+        ----------
+        token: :class:`str`
+            The token to validate.
+
+        Returns
+        -------
+        :class:`tuple[User, str]`
+            A tuple containing the user that the token belongs to and
+            the token itself.
+
+        Raises
+        ------
+        :class:`rest_framework.exceptions.ValidationError`
+            Raised when the token is invalid or the user does not exist.
+        """
+        serializer = URLSafeSerializer(settings.SECRET_KEY, salt="auth")
+
+        try:
+            user_id = serializer.loads(token, salt="auth")
+        except BadSignature as exc:
+            raise ValidationError(_("Invalid token.")) from exc
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist as exc:
+            raise ValidationError(_("Invalid token.")) from exc
+
+        return (user, token)

@@ -52,7 +52,7 @@ msgstr ""
 
 #: authentication.py:203
 msgid "Invalid token."
-msgstr ""
+msgstr "Invalid token provided"
 
 #: authtoken/apps.py:7
 msgid "Auth Token"
@@ -112,7 +112,7 @@ msgstr ""
 
 #: exceptions.py:173
 msgid "Authentication credentials were not provided."
-msgstr ""
+msgstr "Authentication credentials were not provided"
 
 #: exceptions.py:179
 msgid "You do not have permission to perform this action."
@@ -125,7 +125,7 @@ msgstr ""
 #: exceptions.py:191
 #, python-brace-format
 msgid "Method \"{method}\" not allowed."
-msgstr ""
+msgstr "Method {method} not allowed"
 
 #: exceptions.py:202
 msgid "Could not satisfy the request Accept header."
@@ -153,11 +153,11 @@ msgstr ""
 #: fields.py:316 relations.py:245 relations.py:279 validators.py:90
 #: validators.py:183
 msgid "This field is required."
-msgstr ""
+msgstr "This field is required"
 
 #: fields.py:317
 msgid "This field may not be null."
-msgstr ""
+msgstr "This field may not be null"
 
 #: fields.py:701
 msgid "Must be a valid boolean."
@@ -174,12 +174,12 @@ msgstr ""
 #: fields.py:768 fields.py:1881
 #, python-brace-format
 msgid "Ensure this field has no more than {max_length} characters."
-msgstr ""
+msgstr "This field must have a maximum of {max_length} characters"
 
 #: fields.py:769
 #, python-brace-format
 msgid "Ensure this field has at least {min_length} characters."
-msgstr ""
+msgstr "This field must have at least {min_length} characters"
 
 #: fields.py:816
 msgid "Enter a valid email address."
@@ -571,3 +571,9 @@ msgstr ""
 
 msgid "This email is already in use."
 msgstr "E-mail already in use"
+
+msgid "User not found."
+msgstr "User not found"
+
+msgid "No available tags."
+msgstr "Too many users have this username, please try another"
