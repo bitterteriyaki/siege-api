@@ -6,15 +6,14 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.urls import re_path
+from rest_framework.routers import SimpleRouter
 
 from apps.users.views import SelfUserView, UsersView
 
 app_name = "users"
 
-urlpatterns = [
-    re_path(r"^v1/users/?$", SelfUserView.as_view(), name="create"),
-    re_path(
-        r"^v1/users/(?P<target>\d+|me)/?$", UsersView.as_view(), name="get"
-    ),
-]
+router = SimpleRouter(trailing_slash=False)
+router.register(r"users", SelfUserView, basename="self")
+router.register(r"users", UsersView, basename="users")
+
+urlpatterns = router.urls

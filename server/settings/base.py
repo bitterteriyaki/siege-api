@@ -6,7 +6,9 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from server.settings import config
+from os.path import join
+
+from server.settings import BASE_DIR, config
 
 # Here's a list of settings available in Django core and their default
 # values.
@@ -93,6 +95,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
+
+LOCALE_PATHS = [join(BASE_DIR, "locale")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
