@@ -116,11 +116,11 @@ msgstr "Authentication credentials were not provided"
 
 #: exceptions.py:179
 msgid "You do not have permission to perform this action."
-msgstr ""
+msgstr "You do not have permission to perform this action"
 
 #: exceptions.py:185
 msgid "Not found."
-msgstr ""
+msgstr "Not found"
 
 #: exceptions.py:191
 #, python-brace-format
