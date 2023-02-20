@@ -11,37 +11,29 @@ from typing import TYPE_CHECKING
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 
 from apps.guilds.models import Guild
-from apps.members.logic.serializers import MemberSerializer
+from apps.users.models import User
 
 if TYPE_CHECKING:
-    GuildOwnerField = PrimaryKeyRelatedField[Guild]
+    GuildOwnerField = PrimaryKeyRelatedField[User]
 else:
     GuildOwnerField = PrimaryKeyRelatedField
 
 
 class GuildSerializer(ModelSerializer[Guild]):
-    """Serializer for the `/guilds` route. This serializer is
-    responsible for validating the data sent to the `/guilds` route
-    and for serializing the data returned by the same route. This
-    serializer also handles the creation of guilds.
-
-    These are the fields that are validated:
-    - `name`: must be a string between 1 and 128 characters long.
-    - `description`: must be a string between 0 and 255 characters.
+    """This serializer is responsible to return the user schema. This is
+    used to represent the guild in the response.
     """
 
     owner_id = GuildOwnerField(read_only=True)
-    members = MemberSerializer(
-        many=True, read_only=True, source="guildmember_set"
-    )
 
     class Meta:
         model = Guild
         # List all of the fields that could possibly be included in a
         # request or response, including fields specified explicitly
         # above.
-        fields = ("id", "name", "owner_id", "description", "members")
+        fields = ("id", "name", "description", "owner_id")
 
     def create(self, validated_data: dict[str, str]) -> Guild:
+        # The owner of the guild is the user who is making the request.
         validated_data["owner_id"] = self.context["request"].user
         return super().create(validated_data)

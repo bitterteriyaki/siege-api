@@ -6,64 +6,69 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
-from rest_framework.generics import RetrieveAPIView
+from django.utils.translation import gettext as _
+from guardian.shortcuts import assign_perm
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.mixins import (
+    CreateModelMixin,
+    DestroyModelMixin,
+    RetrieveModelMixin,
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
-from rest_framework.views import APIView
+from rest_framework.status import HTTP_201_CREATED
+from rest_framework.viewsets import GenericViewSet
 
 from apps.guilds.logic.serializers import GuildSerializer
-from apps.guilds.logic.utils import get_guild
 from apps.guilds.models import Guild
-from apps.members.models import Member
+from apps.users.models import User
 from core.renderers import BaseJSONRenderer
 
 if TYPE_CHECKING:
-    GuildView = RetrieveAPIView[Guild]
+    GuildGenericViewSet = GenericViewSet[Guild]
 else:
-    GuildView = RetrieveAPIView
+    GuildGenericViewSet = GenericViewSet
 
 
-class GuildsView(APIView):
-    """View responsible for the `/guilds` route.
-
-    Currently these are the endpoints available for this route:
-    - `POST /guilds`: creates a new guild.
+class GuildsView(
+    CreateModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    GuildGenericViewSet,
+):
+    """This view is responsible for managing guilds. It is required to
+    be authenticated to use this view. Some actions are also restricted
+    to the guild owner -- such as deleting the guild, but superusers
+    can perform any action.
     """
 
-    permission_classes = (IsAuthenticated,)
-    renderer_classes = (BaseJSONRenderer,)
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [BaseJSONRenderer]
     serializer_class = GuildSerializer
+    queryset = Guild.objects.all()
 
-    def post(self, request: Request) -> Response:
-        context = {"request": request}
-
-        serializer = self.serializer_class(data=request.data, context=context)
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        user = cast(User, request.user)
         guild = serializer.save()
 
-        member = Member(guild=guild, user=request.user)
-        member.save()
+        # Assign the permission to delete the guild to the user.
+        assign_perm("delete_guild", user, guild)
 
         return Response(serializer.data, status=HTTP_201_CREATED)
 
+    def destroy(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        user = cast(User, request.user)
+        guild = self.get_object()
 
-class GuildRetrieveView(GuildView):
-    """View responsible for the `/guilds/<guild_id>` route.
+        if not user.has_perm("guilds.delete_guild", guild):
+            raise PermissionDenied(
+                _("You do not have permission to perform this action.")
+            )
 
-    Currently these are the endpoints available for this route:
-    - `GET /guilds/<guild_id>`: retrieves a guild.
-    """
-
-    permission_classes = (IsAuthenticated,)
-    renderer_classes = (BaseJSONRenderer,)
-    serializer_class = GuildSerializer
-
-    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
-        guild_id = kwargs["guild_id"]
-        serializer = self.serializer_class(get_guild(guild_id))
-
-        return Response(serializer.data, status=HTTP_200_OK)
+        return super().destroy(request, *args, **kwargs)

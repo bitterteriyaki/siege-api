@@ -16,11 +16,13 @@ from rest_framework.status import (
 )
 from rest_framework.test import APITestCase
 
+from apps.guilds.logic.serializers import GuildSerializer
+from apps.guilds.models import Guild
 from apps.users.models import User
 
 
 class GuildsTestCase(APITestCase):
-    """Test cases for `/guilds` route."""
+    """Test case responsible to test the guild management endpoints."""
 
     def setUp(self) -> None:
         credentials = {
@@ -32,95 +34,92 @@ class GuildsTestCase(APITestCase):
         self.user = User.objects.create_user(**credentials)
 
     def test_create_guild_sucessfully(self) -> None:
-        url = reverse("guilds:create")
+        url = reverse("guilds:guilds-list")
         self.client.force_authenticate(user=self.user)
 
         data = {"name": "guild", "description": "description"}
-        resp = self.client.post(url, data=data)
+        res = self.client.post(url, data=data)
 
-        self.assertEqual(resp.status_code, HTTP_201_CREATED)
-        self.assertIn("id", resp.data)
-        self.assertIn("name", resp.data)
-        self.assertIn("description", resp.data)
-        self.assertIn("owner_id", resp.data)
+        self.assertEqual(res.status_code, HTTP_201_CREATED)
+        self.assertIn("id", res.data)
 
-        self.assertEqual(resp.data["name"], data["name"])
-        self.assertEqual(resp.data["description"], data["description"])
-        self.assertEqual(resp.data["owner_id"], self.user.id)
+        guild = Guild.objects.get(id=res.data["id"])
+        expected = GuildSerializer(guild)
+
+        self.assertDictEqual(res.data, expected.data)
 
     def test_create_guild_without_authentication(self) -> None:
-        url = reverse("guilds:create")
-        expected = "Authentication credentials were not provided."
+        url = reverse("guilds:guilds-list")
 
         data = {"name": "guild", "description": "description"}
-        resp = self.client.post(url, data=data)
+        res = self.client.post(url, data=data)
 
-        self.assertEqual(resp.status_code, HTTP_401_UNAUTHORIZED)
-        self.assertIn("error", resp.data)
+        expected = {
+            "status": HTTP_401_UNAUTHORIZED,
+            "errors": {
+                "detail": "Authentication credentials were not provided"
+            },
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("detail", details)
-        self.assertIn(expected, details["detail"])
+        self.assertEqual(res.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(res.data, expected)
 
     def test_create_guild_without_name(self) -> None:
-        url = reverse("guilds:create")
-        expected = "This field is required."
-
+        url = reverse("guilds:guilds-list")
         self.client.force_authenticate(user=self.user)
 
         data = {"description": "description"}
-        resp = self.client.post(url, data=data)
+        res = self.client.post(url, data=data)
 
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"name": ["This field is required"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("name", details)
-        self.assertIn(expected, details["name"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
     def test_get_guild_sucessfully(self) -> None:
-        url = reverse("guilds:create")
         self.client.force_authenticate(user=self.user)
 
-        data = {"name": "guild", "description": "description"}
-        resp = self.client.post(url, data=data)
+        guild = Guild.objects.create(
+            name="guild", description="description", owner_id=self.user
+        )
+        url = reverse("guilds:guilds-detail", kwargs={"pk": guild.id})
 
-        self.assertEqual(resp.status_code, HTTP_201_CREATED)
-        self.assertIn("id", resp.data)
+        res = self.client.get(url)
+        expected = GuildSerializer(guild)
 
-        guild_id = resp.data["id"]
-        url = reverse("guilds:get", kwargs={"guild_id": guild_id})
-        resp = self.client.get(url)
+        self.assertEqual(res.status_code, HTTP_200_OK)
+        self.assertDictEqual(res.data, expected.data)
 
-        self.assertEqual(resp.status_code, HTTP_200_OK)
-        self.assertIn("id", resp.data)
-        self.assertIn("name", resp.data)
-        self.assertIn("description", resp.data)
-        self.assertIn("owner_id", resp.data)
+    def test_get_guild_without_authentication(self) -> None:
+        guild = Guild.objects.create(
+            name="guild", description="description", owner_id=self.user
+        )
+        url = reverse("guilds:guilds-detail", kwargs={"pk": guild.id})
 
-        self.assertEqual(resp.data["name"], data["name"])
-        self.assertEqual(resp.data["description"], data["description"])
-        self.assertEqual(resp.data["owner_id"], self.user.id)
+        res = self.client.get(url)
+
+        expected = {
+            "status": HTTP_401_UNAUTHORIZED,
+            "errors": {
+                "detail": "Authentication credentials were not provided"
+            },
+        }
+
+        self.assertEqual(res.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(res.data, expected)
 
     def test_get_non_existing_guild(self) -> None:
-        url = reverse("guilds:get", kwargs={"guild_id": 1})
+        url = reverse("guilds:guilds-detail", kwargs={"pk": 1})
         self.client.force_authenticate(user=self.user)
 
-        expected = "Guild not found."
-        resp = self.client.get(url)
+        res = self.client.get(url)
+        expected = {
+            "status": HTTP_404_NOT_FOUND,
+            "errors": {"detail": "Not found"},
+        }
 
-        self.assertEqual(resp.status_code, HTTP_404_NOT_FOUND)
-        self.assertIn("error", resp.data)
-
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("detail", details)
-        self.assertIn(expected, details["detail"])
+        self.assertEqual(res.status_code, HTTP_404_NOT_FOUND)
+        self.assertDictEqual(res.data, expected)

@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     # Third-party apps:
     "rest_framework",
+    "guardian",
     # Local apps:
     "apps.users",
     "apps.authentication",
@@ -46,6 +47,11 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+    "guardian.backends.ObjectPermissionBackend",
 ]
 
 ROOT_URLCONF = "server.urls"
@@ -122,3 +128,8 @@ REST_FRAMEWORK = {
         "apps.authentication.logic.backend.TokenAuthentication",
     ],
 }
+
+# Guardian settings
+# https://django-guardian.readthedocs.io/en/stable/configuration.html
+
+ANONYMOUS_USER_NAME = None
