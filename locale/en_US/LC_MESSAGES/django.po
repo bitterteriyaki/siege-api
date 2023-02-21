@@ -88,7 +88,7 @@ msgstr ""
 
 #: authtoken/serializers.py:35
 msgid "Unable to log in with provided credentials."
-msgstr ""
+msgstr "Unable to login with provided credentials"
 
 #: authtoken/serializers.py:38
 msgid "Must include \"username\" and \"password\"."
@@ -169,7 +169,7 @@ msgstr ""
 
 #: fields.py:767
 msgid "This field may not be blank."
-msgstr ""
+msgstr "This field may not be blank"
 
 #: fields.py:768 fields.py:1881
 #, python-brace-format
