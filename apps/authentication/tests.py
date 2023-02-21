@@ -9,6 +9,7 @@ Siege. All rights reserved
 from typing import Any
 
 from django.urls import reverse
+from rest_framework.exceptions import ValidationError
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
@@ -16,6 +17,7 @@ from rest_framework.status import (
 )
 from rest_framework.test import APITestCase
 
+from apps.authentication.logic.backend import TokenAuthentication
 from apps.users.models import User
 
 
@@ -146,3 +148,26 @@ class LoginTestCase(APITestCase):
 
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
         self.assertDictEqual(res.data, expected)
+
+
+class TokenAuthenticationTestCase(APITestCase):
+    """Test case for the token authentication."""
+
+    def setUp(self) -> None:
+        self.auth = TokenAuthentication()
+        self.user = User.objects.create_user(
+            email="user@email.com",
+            username="username",
+            password="password",
+        )
+
+    def test_authenticate_with_valid_token(self) -> None:
+        res = self.auth.validate_token(self.user.token)
+        expected = (self.user, self.user.token)
+
+        self.assertTupleEqual(res, expected)
+
+    def test_authenticate_with_invalid_token(self) -> None:
+        self.assertRaises(
+            ValidationError, self.auth.validate_token, "invalid_token"
+        )
