@@ -55,10 +55,7 @@ class TokenAuthentication(BaseAuthentication):
         """
         auth_header = get_authorization_header(request).split()
 
-        if not auth_header:
-            return None
-
-        if len(auth_header) != 2:
+        if not auth_header or len(auth_header) != 2:
             return None
 
         prefix = auth_header[0].decode("utf-8")
@@ -92,7 +89,7 @@ class TokenAuthentication(BaseAuthentication):
 
         Returns
         -------
-        :class:`tuple[User, str]`
+        tuple[:class:`User`, str]
             A tuple containing the user that the token belongs to and
             the token itself.
 

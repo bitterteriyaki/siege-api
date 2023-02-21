@@ -6,223 +6,179 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import Any
+
 from django.urls import reverse
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_400_BAD_REQUEST,
-    HTTP_403_FORBIDDEN,
+    HTTP_401_UNAUTHORIZED,
 )
 from rest_framework.test import APITestCase
 
-from apps.users.logic.backend import (
-    encode_to_b64,
-    generate_token,
-    validate_token,
-)
+from apps.authentication.logic.backend import TokenAuthentication
 from apps.users.models import User
 
 
-class AuthenticationTestCase(APITestCase):
-    """Test cases for `/auth` route."""
+class LoginTestCase(APITestCase):
+    """Test case for the login endpoint."""
 
     def setUp(self) -> None:
-        self.example = {"email": "user@email.com", "password": "password"}
+        self.example: dict[str, Any] = {
+            "email": "user@email.com",
+            "password": "password",
+        }
         self.url = reverse("authentication:login")
-
         self.user = User.objects.create_user(
-            **self.example,
-            username="username",
+            **self.example, username="username"
         )
 
     def test_login_user_successfully(self) -> None:
-        resp = self.client.post(self.url, self.example)
+        res = self.client.post(self.url, self.example)
+        expected = {"token": self.user.token}
 
-        self.assertEqual(resp.status_code, HTTP_200_OK)
-        self.assertIn("token", resp.data)
-        self.assertEqual(resp.data["token"], self.user.token)
+        self.assertEqual(res.status_code, HTTP_200_OK)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_invalid_email(self) -> None:
         self.example["email"] = "invalid_email"
-        expected = "Enter a valid email address."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"email": ["Invalid e-mail address"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("email", details)
-        self.assertIn(expected, details["email"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_wrong_password(self) -> None:
         self.example["password"] = "wrong_password"
-        expected = "Unable to login with provided credentials."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_403_FORBIDDEN)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_401_UNAUTHORIZED,
+            "errors": {"detail": "Unable to login with provided credentials"},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("detail", details)
-        self.assertIn(expected, details["detail"])
+        self.assertEqual(res.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_non_existent_email(self) -> None:
         self.example["email"] = "other@email.com"
-        expected = "Unable to login with provided credentials."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_403_FORBIDDEN)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_401_UNAUTHORIZED,
+            "errors": {"detail": "Unable to login with provided credentials"},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("detail", details)
-        self.assertIn(expected, details["detail"])
+        self.assertEqual(res.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_empty_email(self) -> None:
         self.example["email"] = ""
-        expected = "This field may not be blank."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"email": ["This field may not be blank"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("email", details)
-        self.assertIn(expected, details["email"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_empty_password(self) -> None:
         self.example["password"] = ""
-        expected = "This field may not be blank."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"password": ["This field may not be blank"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("password", details)
-        self.assertIn(expected, details["password"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_missing_email(self) -> None:
         del self.example["email"]
-        expected = "This field is required."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"email": ["This field is required"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("email", details)
-        self.assertIn(expected, details["email"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
     def test_login_user_with_missing_password(self) -> None:
         del self.example["password"]
-        expected = "This field is required."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"password": ["This field is required"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
-        details = error["details"]
-        self.assertIn("password", details)
-        self.assertIn(expected, details["password"])
-
-    def test_login_user_null_email(self) -> None:
+    def test_login_user_with_null_email(self) -> None:
         self.example["email"] = None
-        expected = "This field may not be null."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"email": ["This field may not be null"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
-        details = error["details"]
-        self.assertIn("email", details)
-        self.assertIn(expected, details["email"])
-
-    def test_login_user_null_password(self) -> None:
+    def test_login_user_with_null_password(self) -> None:
         self.example["password"] = None
-        expected = "This field may not be null."
 
-        resp = self.client.post(self.url, self.example)
-        self.assertEqual(resp.status_code, HTTP_400_BAD_REQUEST)
-        self.assertIn("error", resp.data)
+        res = self.client.post(self.url, self.example)
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"password": ["This field may not be null"]},
+        }
 
-        error = resp.data["error"]
-        self.assertIn("details", error)
-
-        details = error["details"]
-        self.assertIn("password", details)
-        self.assertIn(expected, details["password"])
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
 
 
 class TokenAuthenticationTestCase(APITestCase):
-    """Test case for the token authentication class."""
+    """Test case for the token authentication."""
 
     def setUp(self) -> None:
-        self.example = {
-            "email": "user@email.com",
-            "username": "user",
-            "password": "password",
-        }
-        self.user = User.objects.create_user(**self.example)
+        self.auth = TokenAuthentication()
+        self.user = User.objects.create_user(
+            email="user@email.com",
+            username="username",
+            password="password",
+        )
 
-    def test_valid_token_v1(self) -> None:
-        validated = validate_token(self.user.token)
+    def test_authenticate_with_valid_token(self) -> None:
+        res = self.auth.validate_token(self.user.token)
         expected = (self.user, self.user.token)
-        self.assertTupleEqual(validated, expected)
 
-    def test_invalid_token_v1_one_term_wrong_version(self) -> None:
-        self.assertRaises(ValidationError, validate_token, "invalid-token")
+        self.assertTupleEqual(res, expected)
 
-    def test_invalid_token_v1_many_terms_wrong_version(self) -> None:
-        token = "invalid.token.format.here"
-        self.assertRaises(ValidationError, validate_token, token)
+    def test_authenticate_with_invalid_token(self) -> None:
+        self.assertRaises(
+            ValidationError, self.auth.validate_token, "invalid_token"
+        )
 
-    def test_invalid_token_v1_one_term_correct_version(self) -> None:
-        self.assertRaises(ValidationError, validate_token, "v1.invalid-token")
-
-    def test_invalid_token_v1_many_terms_correct_version(self) -> None:
-        token = "v1.invalid.token.format.here"
-        self.assertRaises(ValidationError, validate_token, token)
-
-    def test_invalid_token_v1_invalid_user_id(self) -> None:
-        token = "v1.test.invalid-token"
-        self.assertRaises(ValidationError, validate_token, token)
-
-    def test_invalid_token_v1_invalid_user(self) -> None:
-        user_id = encode_to_b64(str(self.user.id + 1).encode("utf-8"))
-        token = f"v1.{user_id}.invalid-token"
-        self.assertRaises(ValidationError, validate_token, token)
-
-    def test_invalid_token_v1_invalid_signature(self) -> None:
-        user_id = encode_to_b64(str(self.user.id).encode("utf-8"))
-        token = f"v1.{user_id}.invalid-token"
-        self.assertRaises(ValidationError, validate_token, token)
-
-    def test_invalid_token_v1_wrong_signature(self) -> None:
-        email = "another@email.com"
-        token = generate_token(str(self.user.id), email, self.user.password)
-        self.assertRaises(ValidationError, validate_token, token)
+    def test_authenticate_with_non_existing_user(self) -> None:
+        user = User(
+            id=2,
+            email="user@email.com",
+            username="username",
+            password="password",
+        )
+        self.assertRaises(
+            ValidationError, self.auth.validate_token, user.token
+        )
