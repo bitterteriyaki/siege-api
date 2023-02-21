@@ -171,3 +171,14 @@ class TokenAuthenticationTestCase(APITestCase):
         self.assertRaises(
             ValidationError, self.auth.validate_token, "invalid_token"
         )
+
+    def test_authenticate_with_non_existing_user(self) -> None:
+        user = User(
+            id=2,
+            email="user@email.com",
+            username="username",
+            password="password",
+        )
+        self.assertRaises(
+            ValidationError, self.auth.validate_token, user.token
+        )
