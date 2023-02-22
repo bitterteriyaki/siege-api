@@ -20,4 +20,4 @@ class Channel(TimestampedModel):
     guild = ForeignKey(Guild, on_delete=CASCADE, related_name="channels")
 
     # The description of the channel. This is optional.
-    description = CharField(max_length=255, blank=True, null=True)
+    description = CharField(max_length=256, null=True)

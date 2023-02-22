@@ -6,7 +6,7 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.urls import include, path, re_path
+from django.urls import include, path
 
 urlpatterns = (
     # apps:
@@ -14,5 +14,5 @@ urlpatterns = (
     path("", include("apps.guilds.urls", namespace="guilds")),
     path("", include("apps.authentication.urls", namespace="authentication")),
     path("", include("apps.members.urls", namespace="members")),
-    re_path(r"^api/", include("apps.channels.urls", namespace="channels")),
+    path("", include("apps.channels.urls", namespace="channels")),
 )
