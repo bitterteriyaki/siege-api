@@ -26,9 +26,8 @@ class Member(Model):
     guild = ForeignKey(Guild, on_delete=CASCADE)
 
     # The nickname of the user in the guild. This is optional. The
-    # nickname can be updated by members with the permission to do
-    # so. The nickname must have a maximum length of 32 characters.
-    nick = CharField(max_length=32, blank=True, null=True)
+    # nickname must have a maximum length of 32 characters.
+    nick = CharField(max_length=32, null=True)
 
     # The date and time when the user joined the guild.
     joined_at = DateTimeField(auto_now_add=True)

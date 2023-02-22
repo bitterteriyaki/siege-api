@@ -57,6 +57,9 @@ class GuildsView(
         user = cast(User, request.user)
         guild = serializer.save()
 
+        # Add the guild owner to the guild.
+        guild.members.add(user)
+
         # Assign the permission to delete the guild to the user.
         assign_perm("delete_guild", user, guild)
 

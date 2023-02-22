@@ -6,23 +6,30 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import TYPE_CHECKING, Any
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.viewsets import ReadOnlyModelViewSet
 
-from apps.guilds.logic.utils import get_guild
 from apps.members.logic.serializers import MemberSerializer
+from apps.members.models import Member
 from core.renderers import BaseJSONRenderer
 
+if TYPE_CHECKING:
+    MemberGenericViewSet = ReadOnlyModelViewSet[Member]
+else:
+    MemberGenericViewSet = ReadOnlyModelViewSet
 
-class MembersViewSet(ReadOnlyModelViewSet):
-    """Viewset responsible for the `/guilds/<guild_id>/members` route.
-    This route is used to retrieve all members of a guild.
+
+class MembersViewSet(MemberGenericViewSet):
+    """This view is responsible for managing members. It is required to
+    be authenticated to use this view. Currently, this view only
+    supports listing and retrieving members.
     """
 
-    permission_classes = (IsAuthenticated,)
-    renderer_classes = (BaseJSONRenderer,)
+    permission_classes = [IsAuthenticated]
+    renderer_classes = [BaseJSONRenderer]
     serializer_class = MemberSerializer
 
-    def get_queryset(self):
-        guild = get_guild(self.kwargs["guild_id"])
-        return guild.member_set.all()
+    def get_queryset(self) -> Any:
+        return Member.objects.filter(guild_id=self.kwargs["guild_id"])
