@@ -6,15 +6,15 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from rest_framework.routers import DefaultRouter
+from rest_framework.routers import SimpleRouter
 
 from apps.members.views import MembersViewSet
 
 app_name = "members"
 
-router = DefaultRouter()
+router = SimpleRouter(trailing_slash=False)
 router.register(
-    r"v1/guilds/(?P<guild_id>\d+)/members", MembersViewSet, basename="members"
+    r"guilds/(?P<guild_id>[^/.]+)/members", MembersViewSet, basename="members"
 )
 
 urlpatterns = router.urls
