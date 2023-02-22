@@ -17,7 +17,10 @@ from apps.users.models import User
 
 
 class LoginSerializer(Serializer[Any]):
-    """ """
+    """Serializer responsible to validate the user credentials and
+    return the user token. This serializer is used to authenticate the
+    user and return the user token in the response.
+    """
 
     email = EmailField(max_length=256, write_only=True, required=True)
     password = CharField(max_length=128, write_only=True, required=True)
