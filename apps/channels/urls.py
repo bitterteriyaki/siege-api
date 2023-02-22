@@ -6,16 +6,15 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.urls import re_path
+from rest_framework.routers import SimpleRouter
 
 from apps.channels.views import ChannelsView
 
 app_name = "channels"
 
-urlpatterns = [
-    re_path(
-        r"^v1/guilds/(?P<guild_id>\d+)/channels/?$",
-        ChannelsView.as_view(),
-        name="create",
-    ),
-]
+router = SimpleRouter(trailing_slash=False)
+router.register(
+    r"guilds/(?P<guild_id>[^/.]+)/channels", ChannelsView, basename="channels"
+)
+
+urlpatterns = router.urls
