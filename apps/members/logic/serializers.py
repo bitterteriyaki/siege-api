@@ -12,7 +12,7 @@ from apps.members.models import Member
 from apps.users.logic.serializers import UserSerializer
 
 
-class MemberSerializer(ModelSerializer):
+class MemberSerializer(ModelSerializer[Member]):
     """Serializer for the `/guilds/<guild_id>/members` route. This
     serializer is responsible for validating the data sent to the route
     and for serializing the data returned by the same route. This
@@ -29,5 +29,5 @@ class MemberSerializer(ModelSerializer):
         fields = ("nick", "user", "joined_at")
         fields_read_only = "__all__"
 
-    def get_user(self, member):
+    def get_user(self, member: Member) -> dict[str, str]:
         return UserSerializer(member.user).data
