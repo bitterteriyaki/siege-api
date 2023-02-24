@@ -6,7 +6,7 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
@@ -15,26 +15,27 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.viewsets import GenericViewSet
 
-from apps.channels.logic.serializers import ChannelSerializer
-from apps.channels.models import Channel
+from apps.messages.logic.serialiazers import MessageSerializer
+from apps.messages.models import Message
+from apps.users.models import User
 from core.renderers import BaseJSONRenderer
 
 if TYPE_CHECKING:
-    ChannelGenericViewSet = GenericViewSet[Channel]
+    MessageGenericViewSet = GenericViewSet[Message]
 else:
-    ChannelGenericViewSet = GenericViewSet
+    MessageGenericViewSet = GenericViewSet
 
 
-class ChannelsView(CreateModelMixin, ChannelGenericViewSet):
-    """This view is responsible for creating channels. It is needed to
-    be authenticated to use this view.
-    """
+class MessagesView(CreateModelMixin, MessageGenericViewSet):
+    """This view is responsible for creating messages."""
 
     permission_classes = [IsAuthenticated]
     renderer_classes = [BaseJSONRenderer]
-    serializer_class = ChannelSerializer
+    serializer_class = MessageSerializer
 
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        kwargs["sender"] = cast(User, request.user)
+
         serializer = self.get_serializer(data=request.data, context=kwargs)
         serializer.is_valid(raise_exception=True)
 

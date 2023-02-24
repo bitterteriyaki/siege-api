@@ -8,9 +8,9 @@ Siege. All rights reserved
 
 from django.apps import AppConfig
 
-default_app_config = "apps.guilds.GuildsConfig"
+default_app_config = "apps.messages.MessagesConfig"
 
 
-class GuildsConfig(AppConfig):
+class MessagesConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
-    name = "apps.guilds"
+    name = "apps.messages"
