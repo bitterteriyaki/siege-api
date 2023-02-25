@@ -28,3 +28,7 @@ class Message(TimestampedModel):
 
     # Whether the message has been deleted by the sender.
     is_deleted = BooleanField(default=True)
+
+    class Meta:
+        # The name of the table in the database.
+        db_table = "messages"
