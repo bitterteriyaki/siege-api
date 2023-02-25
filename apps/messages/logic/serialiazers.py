@@ -8,6 +8,7 @@ Siege. All rights reserved
 
 from typing import Any
 
+from django.utils.translation import gettext as _
 from rest_framework.exceptions import NotFound
 from rest_framework.serializers import (
     CharField,
@@ -40,7 +41,7 @@ class MessageSerializer(ModelSerializer[Message]):
         recipient = get_user(user_id=self.context["user_id"])
 
         if not recipient or not recipient.is_active:
-            raise NotFound("User not found.")
+            raise NotFound(_("User not found."))
 
         return Message.objects.create(
             sender=sender, recipient=recipient, **validated_data
