@@ -17,7 +17,7 @@ from rest_framework.serializers import (
 
 from apps.messages.models import Message
 from apps.users.logic.serializers import UserSerializer
-from apps.users.models import User
+from apps.users.logic.utils import get_user
 
 
 class MessageSerializer(ModelSerializer[Message]):
@@ -37,7 +37,7 @@ class MessageSerializer(ModelSerializer[Message]):
 
     def create(self, validated_data: dict[str, str]) -> Message:
         sender = self.context["sender"]
-        recipient = User.objects.get(id=self.context["user_id"])
+        recipient = get_user(user_id=self.context["user_id"])
 
         if not recipient or not recipient.is_active:
             raise NotFound("User not found.")
