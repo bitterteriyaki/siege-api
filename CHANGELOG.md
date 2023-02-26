@@ -1,3 +1,30 @@
+## 0.4.0 (26/02/2023)
+
+### Features
+
+- `apps/messages`: initial messages app
+- `apps/members`: add typings to members serializer
+- `apps/channels`: rewrite channels app
+- `apps/members`: rewrite members app
+- `apps/authentication`: rewrite authentication app
+- `apps/guilds`: rewrite guilds app
+- `apps/users`: rewrite users app
+- `core/exceptions`: change error response payload schema
+- `apps`: add typings to tests
+- `apps`: add typings to the application
+- `app/channels`: initial channels system
+
+### Fixes
+
+- `apps/users`: add a table name for users model
+- `apps/messages`: raise an error when the user tries to send a message to itself
+- `apps/messages`: change messages model table name
+- `apps/messages`: fix message error when the user does not exist
+
+### Refactors
+
+- `apps/messages`: use `get_user` helper function
+
 ## 0.3.0 (01/02/2023)
 
 ### Features

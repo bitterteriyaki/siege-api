@@ -10,10 +10,13 @@ from pathlib import Path
 
 from decouple import AutoConfig
 
-# Build paths inside the project like this: BASE_DIR.joinpath('some')
-# `pathlib` is better than writing: dirname(dirname(dirname(__file__)))
+# Your Django project directory. It is the directory that contains your
+# `manage.py` file.
+
 BASE_DIR = Path(__file__).parent.parent.parent
 
-# Loading `.env` files
-# See docs: https://gitlab.com/mkleehammer/autoconfig
+# Configuration for the decouple library. It is used to read environment
+# variables from a `.env` file.
+# https://github.com/HBNetwork/python-decouple
+
 config = AutoConfig(search_path=BASE_DIR.joinpath("config"))

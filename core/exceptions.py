@@ -6,12 +6,18 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import Any, Mapping
+
+from rest_framework.exceptions import APIException
+from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
 from core.renderers import BaseJSONRenderer
 
 
-def main_exception_handler(exc, context):
+def main_exception_handler(
+    exc: APIException, context: Mapping[str, Any]
+) -> Response | None:
     """A custom exception handler that returns errors in a format that
     is consistent with the rest of the API. The response will include
     a `status_code` key that will contain the HTTP status code of the
@@ -22,16 +28,16 @@ def main_exception_handler(exc, context):
     ----------
     exc: :class:`Exception`
         The exception that was raised.
-    context: Dict[:class:`str`, Any]
+    context: Mapping[:class:`str`, Any]
         The context of the exception.
     """
     context["request"].accepted_renderer = BaseJSONRenderer()
     response = exception_handler(exc, context)
 
-    if not response:
+    if response is None:
         return None
 
-    error = {"details": response.data, "code": response.status_code}
-    response.data = {"error": error}
+    data = {"status": response.status_code, "errors": response.data}
+    response.data = data
 
     return response

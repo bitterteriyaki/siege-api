@@ -10,7 +10,7 @@ import sys
 from os import environ
 
 
-def main():
+def main() -> None:
     """Run administrative tasks."""
     environ.setdefault("DJANGO_SETTINGS_MODULE", "server.settings.development")
 
