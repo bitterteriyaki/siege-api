@@ -74,29 +74,20 @@ class UserManager(BaseUserManager["User"]):
 
 
 class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
-    # Every user has a unique ID that is used to identify them in the
-    # database. In this case, we are just telling Mypy that the type
-    # of the `id` field is an integer.
+    """Represents a user of our platform."""
+
+    # Telling Mypy that the type of this field is an integer.
+    # This is necessary because Mypy doesn't know that Django will
+    # automatically add an `id` field to the model.
     id: int
 
-    # Each `User` needs a human-readable unique identifier that we can
-    # use to represent the `User` in the UI. We want to index this
-    # column in the database to improve lookup performance.
     username = CharField(db_index=True, max_length=32)
-
-    # We also need a way to contact the user and a way for the user to
-    # identify themselves when logging in. Since we need an e-mail
-    # address for contacting the user anyways, we will also use the
-    # e-mail for logging in because it is the most common form of login
-    # credential at the time of writing.
     email = EmailField(db_index=True, max_length=255, unique=True)
-
     # Each user must have a tag which will permit multiple users to
     # have the same username. The tag will be an integer from 0 to 9999.
     # Users with the same username will not be able to have the same
     # tag.
     tag = SmallIntegerField()
-
     # When a user no longer wishes to use our platform, they may try to
     # delete there account. That's a problem for us because the data we
     # collect is valuable to us and we don't want to delete it. To solve
@@ -115,7 +106,6 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     objects = UserManager()
 
     class Meta:
-        # The name of the table in the database.
         db_table = "users"
 
     @property
