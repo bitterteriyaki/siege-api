@@ -9,7 +9,7 @@ Siege. All rights reserved
 from typing import Any
 
 from django.utils.translation import gettext as _
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
@@ -40,8 +40,11 @@ class MessageSerializer(ModelSerializer[Message]):
         sender = self.context["sender"]
         recipient = get_user(user_id=self.context["user_id"])
 
-        if not recipient or not recipient.is_active:
+        if not recipient.is_active:
             raise NotFound(_("User not found."))
+
+        if sender == recipient:
+            raise ValidationError(_("You cannot send a message to yourself."))
 
         return Message.objects.create(
             sender=sender, recipient=recipient, **validated_data
