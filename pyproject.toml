@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "api"
-version = "0.3.0"
+version = "0.4.0"
 description = "Repository for Siege API Service."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
@@ -35,7 +35,7 @@ profile = "black"
 line_length = 79
 
 [tool.commitizen]
-version = "0.3.0"
+version = "0.4.0"
 version_files = ["pyproject.toml"]
 update_changelog_on_bump = true
 changelog_incremental = true
