@@ -44,7 +44,9 @@ class MessageSerializer(ModelSerializer[Message]):
             raise NotFound(_("User not found."))
 
         if sender == recipient:
-            raise ValidationError(_("You cannot send a message to yourself."))
+            raise ValidationError(
+                {"detail": _("You cannot send a message to yourself")}
+            )
 
         return Message.objects.create(
             sender=sender, recipient=recipient, **validated_data
