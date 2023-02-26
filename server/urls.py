@@ -11,8 +11,6 @@ from django.urls import include, path
 urlpatterns = (
     # apps:
     path("", include("apps.users.urls", namespace="users")),
-    path("", include("apps.guilds.urls", namespace="guilds")),
     path("", include("apps.authentication.urls", namespace="authentication")),
-    path("", include("apps.members.urls", namespace="members")),
-    path("", include("apps.channels.urls", namespace="channels")),
+    path("", include("apps.messages.urls", namespace="messages")),
 )

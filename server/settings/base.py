@@ -26,17 +26,13 @@ INSTALLED_APPS = [
     # Default Django apps:
     "django.contrib.auth",
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
-    "django.contrib.messages",
     # Third-party apps:
     "rest_framework",
     "guardian",
     # Local apps:
     "apps.users",
     "apps.authentication",
-    "apps.guilds",
-    "apps.members",
-    "apps.channels",
+    "apps.messages",
 ]
 
 MIDDLEWARE = [
