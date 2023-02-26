@@ -114,6 +114,10 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
     # manage objects of this type.
     objects = UserManager()
 
+    class Meta:
+        # The name of the table in the database.
+        db_table = "users"
+
     @property
     def token(self) -> str:
         """Returns a token that can be used to authenticate this user.
