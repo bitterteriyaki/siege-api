@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "api"
 version = "0.3.0"
-description = "A Proof of Concept for API development in Python."
+description = "Repository for Siege API Service."
 authors = ["Your Name <you@example.com>"]
 readme = "README.md"
 
@@ -10,16 +10,21 @@ python = "^3.11"
 django = "^4.1.7"
 psycopg2 = "^2.9.5"
 djangorestframework = "^3.14.0"
-python-decouple = "^3.6"
+python-decouple = "^3.7"
+itsdangerous = "^2.1.2"
+django-guardian = "^2.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
-pre-commit = "^2.21.0"
-black = "^22.12.0"
-isort = "^5.11.4"
-commitizen = "^2.38.0"
+pre-commit = "^3.0.4"
+black = "^23.1.0"
+isort = "^5.12.0"
+commitizen = "^2.40.0"
 flake8 = "^6.0.0"
-coverage = "^7.0.3"
+coverage = "^7.1.0"
+mypy = "^0.991"
+django-stubs = {version = "^1.14.0", extras = ["compatible-mypy"]}
+djangorestframework-stubs = {version = "^1.8.0", extras = ["compatible-mypy"]}
 
 [tool.black]
 color = true
@@ -29,7 +34,6 @@ line-length = 79
 profile = "black"
 line_length = 79
 
-# TODO: add a custom changelog template
 [tool.commitizen]
 version = "0.3.0"
 version_files = ["pyproject.toml"]

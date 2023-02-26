@@ -20,18 +20,3 @@ class BaseJSONRenderer(JSONRenderer):
     """
 
     charset = "utf-8"
-
-
-class UserJSONRenderer(BaseJSONRenderer):
-    """Renderer for the :class:`User` model. This renderer will
-    render the :class:`User` model into JSON format.
-
-    - `tag` will be converted to a string and padded with zeros.
-
-    If the `User` model has any errors, the `errors` key will be
-    rendered instead of the `User` model.
-    """
-
-    def render(self, data, accepted_media_type, renderer_context):
-        data["tag"] = data["tag"].zfill(4)
-        return super().render(data, accepted_media_type, renderer_context)

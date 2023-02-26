@@ -6,37 +6,39 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from typing import Any
+
+from django.utils.translation import gettext as _
 from rest_framework.serializers import CharField, EmailField, ModelSerializer
 from rest_framework.validators import UniqueValidator
 
 from apps.users.models import User
 
 
-class SelfUserSerializer(ModelSerializer):
-    """Serializer for the `/users` route. This serializer is responsible
-    for validating the data sent to the `/users` route and for
-    serializing the data returned by the same route.
-
-    These are the fields that are validated:
-    - `username`: must be a string between 2 and 32 characters long.
-    - `password`: must be a string between 8 and 128 characters long.
-    - `email`: must be a valid e-mail address.
-    - `token`: must be a string between 1 and 255 characters long.
+class SelfUserSerializer(ModelSerializer[User]):
+    """Serializer responsible to return sensitive data about the user,
+    this is only used to return the user token when the user is creating
+    a new account. Also, when the user is creating a new account, they
+    must provide an username, an e-mail and a password. The token is
+    returned in the response.
     """
 
     # Username should have a minimum length of 2 characters and a
-    # maximum length of 32 characters.
+    # maximum length of 32 characters. This is a write-only field so
+    # that it is not returned in the response.
     username = CharField(min_length=2, max_length=32, write_only=True)
 
     # The e-mail should be a valid e-mail address and it is also
-    # write-only so that it is not returned in the response.
+    # write-only so that it is not returned in the response. This field
+    # also has a unique validator so that no two users can have the same
+    # e-mail address.
     email = EmailField(
-        max_length=255,
+        max_length=256,
         write_only=True,
         validators=[
             UniqueValidator(
                 queryset=User.objects.all(),
-                message="This email is already in use.",
+                message=_("This email is already in use."),
             )
         ],
     )
@@ -46,10 +48,9 @@ class SelfUserSerializer(ModelSerializer):
     # that it is not returned in the response.
     password = CharField(min_length=8, max_length=128, write_only=True)
 
-    # The user token should be a string with a maximum length of 255
-    # characters and it is also read-only so that it is not included
-    # in the request.
-    token = CharField(max_length=255, read_only=True)
+    # The token is a string between 1 and 255 characters long and it is
+    # read-only so that it must not be provided in the request.
+    token = CharField(max_length=256, read_only=True)
 
     class Meta:
         model = User
@@ -58,23 +59,15 @@ class SelfUserSerializer(ModelSerializer):
         # above.
         fields = ("username", "email", "password", "token")
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, Any]) -> User:
         return User.objects.create_user(**validated_data)
 
 
-class UsersSerializer(ModelSerializer):
-    """Serializer for the `/users/<user_id>` route. This serializer is
-    responsible for validating the data sent to the `/users/<user_id>`
-    route and for serializing the data returned by the same route. All
-    of the fields are read-only.
-
-    These are the fields that are validated:
-    - `tag`: must be a string between 1 and 4 characters long.
+class UserSerializer(ModelSerializer[User]):
+    """This serializer is responsible to return the user schema, this
+    must not return sensitive data like the user token. This is used
+    to represent an user in the response.
     """
-
-    # The user tag should be a string with a maximum length of 4
-    # characters.
-    tag = CharField(max_length=4)
 
     class Meta:
         model = User
@@ -82,4 +75,11 @@ class UsersSerializer(ModelSerializer):
         # request or response, including fields specified explicitly
         # above.
         fields = ("id", "username", "tag", "created_at")
-        fields_only_fields = "__all__"
+        read_only_fields = fields
+
+    def to_representation(self, instance: User) -> Any:
+        representation = super().to_representation(instance)
+        # Fill the tag with zeros to the left so that it has a length
+        # of 4 characters.
+        representation["tag"] = str(instance.tag).zfill(4)
+        return representation

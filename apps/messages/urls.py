@@ -8,12 +8,13 @@ Siege. All rights reserved
 
 from rest_framework.routers import SimpleRouter
 
-from apps.users.views import SelfUserView, UsersView
+from apps.messages.views import MessagesView
 
-app_name = "users"
+app_name = "messages"
 
 router = SimpleRouter(trailing_slash=False)
-router.register(r"users", SelfUserView, basename="self")
-router.register(r"users", UsersView, basename="users")
+router.register(
+    r"channels/(?P<user_id>[^./]+)/messages", MessagesView, basename="messages"
+)
 
 urlpatterns = router.urls

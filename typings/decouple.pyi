@@ -1,0 +1,6 @@
+from pathlib import Path
+from typing import Any
+
+class AutoConfig:
+    def __init__(self, search_path: str | Path | None = ...) -> None: ...
+    def __call__(self, *args: Any, **kwds: Any) -> Any: ...
