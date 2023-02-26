@@ -34,6 +34,7 @@ jobs:
           black .
           flake8 .
           isort .
+          mypy .
       - name: Generate config files
         run: |
           cp config/.env.example config/.env

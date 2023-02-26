@@ -28,3 +28,13 @@ repos:
     rev: 6.0.0
     hooks:
       - id: flake8
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.0.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [
+          'django-stubs>=1.14.0,<2.0',
+          'djangorestframework-stubs>=1.8.0,<2.0',
+          'python-decouple>=3.7,<4.0',
+          'itsdangerous>=2.1.2,<3.0'
+        ]
