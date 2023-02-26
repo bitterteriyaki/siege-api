@@ -15,7 +15,7 @@ from rest_framework.status import (
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
 )
-from rest_framework.test import APITestCase
+from rest_framework.test import APIRequestFactory, APITestCase
 
 from apps.authentication.logic.backend import TokenAuthentication
 from apps.users.models import User
@@ -160,6 +160,9 @@ class TokenAuthenticationTestCase(APITestCase):
             username="username",
             password="password",
         )
+        self.url = reverse("authentication:login")
+        self.factory = APIRequestFactory()
+        self.payload = {"email": self.user.email, "password": "password"}
 
     def test_authenticate_with_valid_token(self) -> None:
         res = self.auth.validate_token(self.user.token)
@@ -182,3 +185,38 @@ class TokenAuthenticationTestCase(APITestCase):
         self.assertRaises(
             ValidationError, self.auth.validate_token, user.token
         )
+
+    def test_authenticate_with_no_header(self) -> None:
+        req = self.factory.get(self.url, self.payload)
+        self.assertIsNone(self.auth.authenticate(req))
+
+    def test_authenticate_with_short_header(self) -> None:
+        req = self.factory.get(
+            self.url, self.payload, HTTP_AUTHORIZATION="Token"
+        )
+        self.assertIsNone(self.auth.authenticate(req))
+
+    def test_authenticate_with_long_header(self) -> None:
+        req = self.factory.get(
+            self.url, self.payload, HTTP_AUTHORIZATION="Token invalid token"
+        )
+        self.assertIsNone(self.auth.authenticate(req))
+
+    def test_authenticate_with_invalid_header_prefix(self) -> None:
+        req = self.factory.get(
+            self.url, self.payload, HTTP_AUTHORIZATION="Invalid invalid_token"
+        )
+        self.assertIsNone(self.auth.authenticate(req))
+
+    def test_authenticate_with_valid_header(self) -> None:
+        req = self.factory.get(
+            self.url,
+            self.payload,
+            HTTP_AUTHORIZATION=f"Token {self.user.token}",
+        )
+
+        res = self.auth.authenticate(req)
+        expected = (self.user, self.user.token)
+
+        assert res is not None
+        self.assertTupleEqual(res, expected)
