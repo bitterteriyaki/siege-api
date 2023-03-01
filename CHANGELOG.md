@@ -1,3 +1,7 @@
+## 0.5.0 (01/03/2023)
+
+- `ci`: add a workflow to upload the application do GitHub Packages
+
 ## 0.4.0 (26/02/2023)
 
 ### Features
