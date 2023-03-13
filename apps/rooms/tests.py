@@ -10,6 +10,7 @@ from rest_framework.reverse import reverse
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
 )
 from rest_framework.test import APITestCase
@@ -76,4 +77,18 @@ class RoomsTestCase(APITestCase):
         }
 
         self.assertEqual(res.status_code, HTTP_401_UNAUTHORIZED)
+        self.assertDictEqual(res.data, expected)
+
+    def test_create_room_with_invalid_recipient_id(self) -> None:
+        self.client.force_authenticate(user=self.main_user)
+
+        url = reverse("rooms:rooms-list")
+
+        res = self.client.post(url, {"recipient_id": 0})
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {"recipient_id": ["User not found"]},
+        }
+
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
         self.assertDictEqual(res.data, expected)

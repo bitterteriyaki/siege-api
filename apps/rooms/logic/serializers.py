@@ -6,6 +6,7 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from django.utils.translation import gettext as _
 from rest_framework.serializers import (
     ModelSerializer,
     PrimaryKeyRelatedField,
@@ -25,7 +26,11 @@ class RoomSerializer(ModelSerializer[Room]):
     """
 
     recipient_id = PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True
+        queryset=User.objects.all(),
+        write_only=True,
+        error_messages={
+            "does_not_exist": _("User not found."),
+        },
     )
     recipient = SerializerMethodField(read_only=True)
 
