@@ -39,7 +39,7 @@ class RoomsView(CreateModelMixin, RoomGenericViewSet):
         serializer = self.get_serializer(data=request.data, context=kwargs)
         serializer.is_valid(raise_exception=True)
 
-        recipient = serializer.validated_data["recipient_id"]
+        recipient = serializer.validated_data["recipient"]
         room = (
             Room.objects.filter(recipients__recipient=request.user)
             .filter(recipients__recipient=recipient)

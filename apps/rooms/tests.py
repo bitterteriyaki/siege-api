@@ -41,7 +41,7 @@ class RoomsTestCase(APITestCase):
         url = reverse("rooms:rooms-list")
         context = {"sender": self.main_user}
 
-        res = self.client.post(url, {"recipient_id": self.target_user.id})
+        res = self.client.post(url, {"recipient": self.target_user.id})
         room = Room.objects.get(recipients__recipient=self.target_user)
 
         expected = RoomSerializer(room, context=context).data
@@ -59,7 +59,7 @@ class RoomsTestCase(APITestCase):
         RoomRecipient.objects.create(room=room, recipient=self.main_user)
         RoomRecipient.objects.create(room=room, recipient=self.target_user)
 
-        res = self.client.post(url, {"recipient_id": self.target_user.id})
+        res = self.client.post(url, {"recipient": self.target_user.id})
         expected = RoomSerializer(room, context=context).data
 
         self.assertEqual(res.status_code, HTTP_200_OK)
@@ -68,7 +68,7 @@ class RoomsTestCase(APITestCase):
     def test_create_room_without_authentication(self) -> None:
         url = reverse("rooms:rooms-list")
 
-        res = self.client.post(url, {"recipient_id": self.target_user.id})
+        res = self.client.post(url, {"recipient": self.target_user.id})
         expected = {
             "status": HTTP_401_UNAUTHORIZED,
             "errors": {
@@ -84,10 +84,10 @@ class RoomsTestCase(APITestCase):
 
         url = reverse("rooms:rooms-list")
 
-        res = self.client.post(url, {"recipient_id": 0})
+        res = self.client.post(url, {"recipient": 0})
         expected = {
             "status": HTTP_400_BAD_REQUEST,
-            "errors": {"recipient_id": ["User not found"]},
+            "errors": {"recipient": ["User not found"]},
         }
 
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)

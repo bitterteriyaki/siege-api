@@ -6,16 +6,11 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from django.utils.translation import gettext as _
-from rest_framework.serializers import (
-    ModelSerializer,
-    PrimaryKeyRelatedField,
-    SerializerMethodField,
-)
+from rest_framework.serializers import ModelSerializer
 
 from apps.rooms.models import Room, RoomRecipient
-from apps.users.logic.serializers import UserSerializer
 from apps.users.models import User
+from core.fields import FetchUserField
 
 
 class RoomSerializer(ModelSerializer[Room]):
@@ -25,24 +20,17 @@ class RoomSerializer(ModelSerializer[Room]):
     the sender wants to chat with.
     """
 
-    recipient_id = PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        write_only=True,
-        error_messages={
-            "does_not_exist": _("User not found."),
-        },
-    )
-    recipient = SerializerMethodField(read_only=True)
+    recipient = FetchUserField(queryset=User.objects.all())
 
     class Meta:
         model = Room
         # List all of the fields that could possibly be included in a
         # request or response, including fields specified explicitly
         # above.
-        fields = ("id", "recipient_id", "recipient", "created_at")
+        fields = ("id", "recipient", "created_at")
 
     def create(self, validated_data: dict[str, int]) -> Room:
-        recipient = validated_data.pop("recipient_id")
+        recipient = validated_data.pop("recipient")
         sender = self.context["sender"]
 
         room = super().create(validated_data)
@@ -50,10 +38,3 @@ class RoomSerializer(ModelSerializer[Room]):
         RoomRecipient.objects.create(room=room, recipient=recipient)
 
         return room
-
-    def get_recipient(self, room: Room) -> dict[str, str]:
-        return UserSerializer(
-            room.recipients.exclude(recipient=self.context["sender"])
-            .first()
-            .recipient
-        ).data
