@@ -8,6 +8,8 @@ Siege. All rights reserved
 
 from typing import TYPE_CHECKING, Any, cast
 
+from django.utils.translation import gettext as _
+from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -40,6 +42,12 @@ class RoomsView(CreateModelMixin, RoomGenericViewSet):
         serializer.is_valid(raise_exception=True)
 
         recipient = serializer.validated_data["recipient"]
+
+        if request.user == recipient:
+            raise ValidationError(
+                {"recipient": [_("You cannot send a message to this user.")]}
+            )
+
         room = (
             Room.objects.filter(recipients__recipient=request.user)
             .filter(recipients__recipient=recipient)

@@ -92,3 +92,19 @@ class RoomsTestCase(APITestCase):
 
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
         self.assertDictEqual(res.data, expected)
+
+    def test_create_room_with_self_recipient(self) -> None:
+        self.client.force_authenticate(user=self.main_user)
+
+        url = reverse("rooms:rooms-list")
+
+        res = self.client.post(url, {"recipient": self.main_user.id})
+        expected = {
+            "status": HTTP_400_BAD_REQUEST,
+            "errors": {
+                "recipient": ["You cannot send a message to this user"]
+            },
+        }
+
+        self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)

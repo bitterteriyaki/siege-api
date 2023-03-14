@@ -577,3 +577,6 @@ msgstr "User not found"
 
 msgid "No available tags."
 msgstr "Too many users have this username, please try another"
+
+msgid "You cannot send a message to this user."
+msgstr "You cannot send a message to this user"
