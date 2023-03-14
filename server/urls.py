@@ -12,5 +12,6 @@ urlpatterns = (
     # apps:
     path("", include("apps.users.urls", namespace="users")),
     path("", include("apps.authentication.urls", namespace="authentication")),
+    path("", include("apps.rooms.urls", namespace="rooms")),
     path("", include("apps.messages.urls", namespace="messages")),
 )
