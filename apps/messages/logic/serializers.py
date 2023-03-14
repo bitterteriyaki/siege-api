@@ -6,10 +6,8 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
-from typing import Any
-
 from django.utils.translation import gettext as _
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.serializers import (
     CharField,
     ModelSerializer,
@@ -17,17 +15,15 @@ from rest_framework.serializers import (
 )
 
 from apps.messages.models import Message
+from apps.rooms.logic.utils import get_room
 from apps.users.logic.serializers import UserSerializer
-from apps.users.logic.utils import get_user
 
 
 class MessageSerializer(ModelSerializer[Message]):
-    """This serializer is used to create a new message. It is used
-    when the user is sending a message to another user.
-    """
+    """This serializer is responsible for serializing messages."""
 
     content = CharField(max_length=2048)
-    sender = SerializerMethodField(read_only=True)
+    sender = SerializerMethodField()
 
     class Meta:
         model = Message
@@ -38,19 +34,16 @@ class MessageSerializer(ModelSerializer[Message]):
 
     def create(self, validated_data: dict[str, str]) -> Message:
         sender = self.context["sender"]
-        recipient = get_user(user_id=self.context["user_id"])
+        room = get_room(room_id=self.context["room_id"])
 
-        if not recipient.is_active:
-            raise NotFound(_("User not found."))
-
-        if sender == recipient:
-            raise ValidationError(
-                {"detail": _("You cannot send a message to yourself")}
+        if not room.has_member(user=sender):
+            raise PermissionDenied(
+                {"detail": _("You cannot send messages to this room.")}
             )
 
         return Message.objects.create(
-            sender=sender, recipient=recipient, **validated_data
+            **validated_data, sender=sender, room=room
         )
 
-    def get_sender(self, message: Message) -> dict[str, Any]:
+    def get_sender(self, message: Message) -> dict[str, str]:
         return UserSerializer(message.sender).data
