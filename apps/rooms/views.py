@@ -45,7 +45,7 @@ class RoomsView(CreateModelMixin, RoomGenericViewSet):
 
         if request.user == recipient:
             raise ValidationError(
-                {"recipient": [_("You cannot create a room with this user.")]}
+                {"recipient": [_("You cannot send a message to this user.")]}
             )
 
         room = (
