@@ -6,6 +6,7 @@ Siege. All rights reserved
 :author: Siege Team
 """
 
+from rest_framework.exceptions import NotFound
 from rest_framework.reverse import reverse
 from rest_framework.status import (
     HTTP_200_OK,
@@ -16,6 +17,7 @@ from rest_framework.status import (
 from rest_framework.test import APITestCase
 
 from apps.rooms.logic.serializers import RoomSerializer
+from apps.rooms.logic.utils import get_room
 from apps.rooms.models import Room, RoomRecipient
 from apps.users.models import User
 
@@ -145,3 +147,13 @@ class RoomsTestCase(APITestCase):
             email="some@user.com", password="password", username="some_user"
         )
         self.assertFalse(room.has_member(user=user))
+
+    def test_utils_get_room(self) -> None:
+        room = Room.objects.create()
+        RoomRecipient.objects.create(room=room, recipient=self.main_user)
+        RoomRecipient.objects.create(room=room, recipient=self.target_user)
+
+        self.assertEqual(get_room(room.id), room)
+
+    def test_utils_get_room_with_invalid_id(self) -> None:
+        self.assertRaises(NotFound, get_room, 0)
