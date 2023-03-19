@@ -1,9 +1,15 @@
-name: Test application and upload test coverage report
+name: Test application
 
 on:
   push:
   pull_request:
     types: [reopened]
+
+env:
+  PUSHER_APP_ID: ${{ secrets.PUSHER_APP_ID }}
+  PUSHER_KEY: ${{ secrets.PUSHER_KEY }}
+  PUSHER_SECRET: ${{ secrets.PUSHER_SECRET }}
+  PUSHER_CLUSTER: ${{ secrets.PUSHER_CLUSTER }}
 
 jobs:
   build:
@@ -44,10 +50,9 @@ jobs:
 
       - name: Generate config files
         run: |
-          cp config/.env.example config/.env
-          sed -i "s/edit-me/$(python -c 'from django.utils.crypto import get_random_string; print(get_random_string(64))')/g" config/.env
+          ./scripts/create-env.sh
 
-      - name: Generate locales
+      - name: Compile translations
         run: |
           python manage.py compilemessages -l en_US
 
@@ -56,7 +61,7 @@ jobs:
           coverage run --source="." manage.py test --settings=server.settings.ci
           coverage xml
 
-      - name: Upload coverage report (Codecov)
+      - name: Upload test coverage report (Codecov)
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

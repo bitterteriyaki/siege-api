@@ -14,7 +14,7 @@ app_name = "messages"
 
 router = SimpleRouter(trailing_slash=False)
 router.register(
-    r"channels/(?P<user_id>[^./]+)/messages", MessagesView, basename="messages"
+    r"rooms/(?P<room_id>[^./]+)/messages", MessagesView, basename="messages"
 )
 
 urlpatterns = router.urls

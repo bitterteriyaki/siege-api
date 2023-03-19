@@ -1,8 +1,12 @@
-# copy the example environment file:
+# Copy the example environment file:
 cp config/.env.example config/.env
 
-# create a secret key for the application:
+# Create a Django secret key for the application:
 SECRET_KEY=$(python3 -c 'from django.utils.crypto import get_random_string; print(get_random_string(64))')
 
-# set the secret key in the environment file:
-sed -i "s/__EDIT_ME__/$SECRET_KEY/" config/.env
+# Set the secret keys in the environment file:
+sed -i -r "s/^(DJANGO_SECRET_KEY=).*/\1$SECRET_KEY/" config/.env
+sed -i -r "s/^(PUSHER_APP_ID=).*/\1$PUSHER_APP_ID/" config/.env
+sed -i -r "s/^(PUSHER_KEY=).*/\1$PUSHER_KEY/" config/.env
+sed -i -r "s/^(PUSHER_SECRET=).*/\1$PUSHER_SECRET/" config/.env
+sed -i -r "s/^(PUSHER_CLUSTER=).*/\1$PUSHER_CLUSTER/" config/.env
