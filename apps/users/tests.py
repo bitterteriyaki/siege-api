@@ -8,6 +8,7 @@ Siege. All rights reserved
 
 from typing import Any
 
+from rest_framework.exceptions import NotFound
 from rest_framework.reverse import reverse
 from rest_framework.status import (
     HTTP_201_CREATED,
@@ -17,6 +18,7 @@ from rest_framework.status import (
 from rest_framework.test import APITestCase
 
 from apps.users.logic.serializers import UserSerializer
+from apps.users.logic.utils import get_user
 from apps.users.models import User
 
 
@@ -274,6 +276,12 @@ class UsersTestCase(APITestCase):
         expected = UserSerializer(self.user)
 
         self.assertDictEqual(res.data, expected.data)
+
+    def test_utils_get_user(self) -> None:
+        self.assertEqual(get_user(self.user.id), self.user)
+
+    def test_utils_get_user_with_invalid_id(self) -> None:
+        self.assertRaises(NotFound, get_user, 0)
 
     def test_get_user_without_authentication(self) -> None:
         url = reverse("users:users-detail", kwargs={"pk": self.user.id})
