@@ -18,8 +18,8 @@ services:
     env_file: ./config/.env
   web:
     <<: &web
-      # image name is changed in production:
-      image: 'siege:dev'
+      # Image name is changed in production:
+      image: 'siege-api:dev'
       build:
         target: development_build
         context: .
@@ -27,8 +27,8 @@ services:
         args:
           DJANGO_ENV: development
         cache_from:
-          - "siege:dev"
-          - "siege:latest"
+          - "siege-api:dev"
+          - "siege-api:latest"
           - "*"
       depends_on:
         - database
@@ -42,7 +42,7 @@ services:
     command: python -Wd manage.py runserver 0.0.0.0:8000
 
 networks:
-  # network for your internals, use it by default:
+  # Network for your internals, use it by default:
   webnet:
 
 volumes:

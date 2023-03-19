@@ -12,13 +12,13 @@ version: '3.9'
 services:
   web:
     ports:
-      # we only bind ports directly in development:
+      # We only bind ports directly in development:
       - '8000:8000'
     volumes:
-      # we only mount source code in development:
+      # We only mount source code in development:
       - .:/app
     build:
-      # needed for fixing permissions of files created by Docker:
+      # Needed for fixing permissions of files created by Docker:
       args:
         - UID=${UID:-1000}
         - GID=${GID:-1000}
