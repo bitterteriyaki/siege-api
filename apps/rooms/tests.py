@@ -122,3 +122,26 @@ class RoomsTestCase(APITestCase):
 
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
         self.assertDictEqual(res.data, expected)
+
+    def test_room_has_member(self) -> None:
+        self.client.force_authenticate(user=self.main_user)
+
+        url = reverse("rooms:rooms-list")
+        context = {"sender": self.main_user}
+
+        res = self.client.post(url, {"recipient": self.target_user.id})
+        room = Room.objects.get(recipients__recipient=self.target_user)
+
+        expected = RoomSerializer(room, context=context).data
+
+        self.assertEqual(res.status_code, HTTP_201_CREATED)
+        self.assertDictEqual(res.data, expected)
+
+        self.assertTrue(room.has_member(user=self.main_user))
+        self.assertTrue(room.has_member(user=self.target_user))
+
+        # Test with a user that is not a member of the room.
+        user = User.objects.create_user(
+            email="some@user.com", password="password", username="some_user"
+        )
+        self.assertFalse(room.has_member(user=user))
