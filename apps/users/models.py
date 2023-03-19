@@ -9,6 +9,7 @@ Siege. All rights reserved
 from __future__ import annotations
 
 import random
+from typing import cast
 
 from django.conf import settings
 from django.contrib.auth.models import (
@@ -120,10 +121,7 @@ class User(AbstractBaseUser, PermissionsMixin, TimestampedModel):
         :class:`str`
             A unique token for the user.
         """
-        serializer = URLSafeSerializer(settings.SECRET_KEY, salt="auth")
-        token = serializer.dumps(self.id)
-
-        if isinstance(token, bytes):
-            token = token.decode("utf-8")
-
-        return token
+        return cast(
+            str,
+            URLSafeSerializer(settings.SECRET_KEY, salt="auth").dumps(self.id),
+        )
