@@ -11,6 +11,7 @@ from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
 )
 from rest_framework.test import APITestCase
@@ -137,4 +138,23 @@ class MessagesTestCase(APITestCase):
         }
 
         self.assertEqual(res.status_code, HTTP_400_BAD_REQUEST)
+        self.assertDictEqual(res.data, expected)
+
+    def test_send_message_without_being_room_member(self) -> None:
+        user = User.objects.create_user(
+            username="user", email="user@email.com", password="password"
+        )
+        self.client.force_authenticate(user=user)
+
+        url = reverse(
+            "messages:messages-list", kwargs={"room_id": self.room.id}
+        )
+
+        res = self.client.post(url, {"content": "Hello world!"})
+        expected = {
+            "status": HTTP_403_FORBIDDEN,
+            "errors": {"detail": "You cannot send messages to this room"},
+        }
+
+        self.assertEqual(res.status_code, HTTP_403_FORBIDDEN)
         self.assertDictEqual(res.data, expected)
