@@ -8,7 +8,6 @@ Siege. All rights reserved
 
 from typing import Any, Mapping
 
-from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 
@@ -16,7 +15,7 @@ from core.renderers import BaseJSONRenderer
 
 
 def main_exception_handler(
-    exc: APIException, context: Mapping[str, Any]
+    exc: Exception, context: Mapping[str, Any]
 ) -> Response | None:
     """A custom exception handler that returns errors in a format that
     is consistent with the rest of the API. The response will include
