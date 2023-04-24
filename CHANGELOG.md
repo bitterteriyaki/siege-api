@@ -1,3 +1,18 @@
+# Changelog
+
+## 0.6.0 (23/04/2023)
+
+### Features
+
+- `apps/messages`: rewrite messages app and implement websockets integration
+- `apps/rooms`: implement a custom field for recipient fetching
+- `apps/rooms`: initial rooms app
+
+### Fixes
+
+- `apps/users`: remove case when the user token returns `bytes`
+- `apps/rooms`: fix bug where it was possible to create a channel with yourself as recipient
+
 ## 0.5.0 (01/03/2023)
 
 - `ci`: add a workflow to upload the application do GitHub Packages
